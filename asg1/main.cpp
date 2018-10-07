@@ -1,12 +1,15 @@
 #include "string_set.h"
 #include <stdio.h>
-#include <string>
+#include <string.h>
 #include <errno.h>
+#include <wait.h>
+#include <libgen.h>
+#include <stdlib.h>
+#include <string>
 using namespace std;
 
 #define LINESIZE 1024
 const string CPP = "/usr/bin/cpp -nostdinc";
-
 
 char line[LINESIZE], buf[LINESIZE];
 void readlines (FILE* pipe, const char* file) {
