@@ -9,10 +9,27 @@ const string CPP = "/usr/bin/cpp -nostdinc";
 
 
 char line[LINESIZE], buf[LINESIZE];
-void readlines(FILE* pipe, const char* file) {
+void readlines (FILE* pipe, const char* file) {
 	for(int linenum = 1;; ++linenum) {
 		char* fgets_rc = fgets (buf, LINESIZE, pipe);
 		printf("%d: %s\n", linenum, fgets_rc);
+//		? why "chomp" : trun \n to \0
+		if (fgets_rc == nullptr) break;
+		int sscanf_rc = sscanf (buf, "# %d \"%[^\"]\"",
+				&linenum, line);
+		if (sscanf_rc == 2) {
+			//This is a DIRECTIVE
+			continue;
+		}
+		char* pos = nullptr;
+		char* bufptr = buf;
+		for (int cnt = 1;; ++cnt) {
+			char* token = strtok_r (bufptr, " \t\n", &pos);
+			bufptr = nullptr;
+			if (token == nullptr) break;
+			printf ("token: %d.%d: [%s]\n",
+				linenum, cnt, token);			
+		}
 	}
 }
 
