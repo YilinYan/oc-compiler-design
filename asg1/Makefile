@@ -2,7 +2,7 @@
 
 CPP    = g++ -g -O0 -std=gnu++17 -Wall -Wextra -Wold-style-cast
 CPPYY  = g++ -g -O0 -std=gnu++17 -Wno-register
-SRCS   = string_set.cpp string_set.h main.cpp
+SRCS   = auxlib.cpp auxlib.h string_set.cpp string_set.h main.cpp
 
 all : ${SRCS}
 	${CPP} ${SRCS} -o main
