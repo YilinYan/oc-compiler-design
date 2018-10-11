@@ -44,7 +44,7 @@ int readlines (string_set& table, string& cmd) {
 	}
 	
 	int pclose_rc = pclose (pipe);
-	eprint_status (cmd.c_str(), pclose_rc);
+	//eprint_status (cmd.c_str(), pclose_rc);
 	if (pclose_rc != 0) return -1;
 	return 0;
 }
