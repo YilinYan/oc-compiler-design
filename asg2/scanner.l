@@ -22,24 +22,24 @@ int yylval_token (int symbol) {
 /*NUMBER          ({MANTISSA}{EXPONENT}?)*/
 /*NOTNUMBER       ({MANTISSA}[Ee][+-]?)*/
 
-LETTER          [A-Za-z_]
-DECDIGIT        [0-9]
-OCTDIGIT        [0-7]
-HEXDIGIT        [0-9a-fA-F]
-DECINT          [1-9]{DECDIGIT}*
-OCTINT          0[OCTDIGIT]*
-HEXINT          0[x|X]{HEXDIGIT}+
+LETTER          ([A-Za-z_])
+DECDIGIT        ([0-9])
+OCTDIGIT        ([0-7])
+HEXDIGIT        ([0-9a-fA-F])
+DECINT          ([1-9]{DECDIGIT}*)
+OCTINT          (0[OCTDIGIT]*)
+HEXINT          (0[x|X]{HEXDIGIT}+)
 
-INT             {DECINT}|{OCTINT}|{HEXINT}
+INT             ({DECINT}|{OCTINT}|{HEXINT})
 IDENT           ({LETTER}({LETTER}|{DECDIGIT})*)
 CHARS           ([^\\'\n]|\\[\\'"0nt])
-CHAR            '{CHARS}'
-STRING          \"{CHARS}\"
+CHAR            ('{CHARS}')
+STRING          (\"{CHARS}\")
 
-/*NOTESCAPE       \\[^\\'"0nt]*/
+NOTESCAPE       (\\[^\\'"0nt])
 NOTIDENT        {DECDIGIT}+{IDENT}
-NOTCHAR         '[^{CHARS}]|'{CHARS}[^']
-NOTSTRING       \"{CHARS}*[^{CHARS}\"]
+NOTCHAR         '{NOTESCAPE}'?|'{CHARS}
+NOTSTRING       \"{CHARS}*{NOTESCAPE}|\"{CHARS}*
 
 %%
 
@@ -90,9 +90,9 @@ NOTSTRING       \"{CHARS}*[^{CHARS}\"]
 {NOTIDENT}      { lexer::badtoken (yytext);
                   return yylval_token (TOK_IDENT); }
 {NOTCHAR}       { lexer::badtoken (yytext);
-                  return yylval_token (TOK_CHAR); }
+                  return yylval_token (TOK_CHARCON); }
 {NOTSTRING}     { lexer::badtoken (yytext);
-                  return yylval_token (TOK_STRING); }
+                  return yylval_token (TOK_STRINGCON); }
 .               { lexer::badchar (*yytext); }
 
 %%
