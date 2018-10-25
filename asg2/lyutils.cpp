@@ -40,6 +40,8 @@ void lexer::advance() {
 void lexer::newline() {
    ++lexer::lloc.linenr;
    lexer::lloc.offset = 0;
+   //add last_yylen
+   lexer::last_yyleng = 0;
 }
 
 void lexer::badchar (unsigned char bad) {
@@ -69,6 +71,8 @@ void lexer::include() {
       }
       lexer::lloc.linenr = linenr - 1;
       lexer::newfilename (filename);
+      //output directive
+      fprintf (tokfile, "%s\n", yytext);
    }
 }
 
@@ -78,6 +82,7 @@ void yyerror (const char* message) {
 }
 
 int yylval_token (int symbol) {
+    lexer::advance();
     yylval = new astree (symbol, lexer::lloc, yytext);
     return symbol;
 }

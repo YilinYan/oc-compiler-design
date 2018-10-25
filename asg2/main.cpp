@@ -15,7 +15,7 @@ using namespace std;
 #include "lyutils.h"
 
 const string CPP = "/usr/bin/cpp";
-static FILE* tokfile = 0;
+FILE* tokfile = 0;
 
 void popen_cpp (string& cmd) {
    yyin = popen (cmd.c_str(), "r");
@@ -51,29 +51,19 @@ void open_tok (string& ocname) {
 }
 
 void readlines (string_set& table) {
-/*
-    FILE* pipe = popen (cmd.c_str(), "r");
-    if (!pipe) {
-        fprintf (stderr, "oc: %s: %s\n", cmd.c_str(), strerror(errno));
-        return -1;
-    }
-*/
     int token = 0;
     while ((token = yylex()) != YYEOF) {    
-        fprintf (tokfile, "%lu %lu\t%s\t%s\n", 
-                yylval->lloc.filenr, yylval->lloc.linenr, 
-                yytext, parser::get_tname(token));
+        
+        fprintf (tokfile, "%3lu%5lu.%03lu%5d   %-15s%s\n", 
+                yylval->lloc.filenr, yylval->lloc.linenr,
+                yylval->lloc.offset, token,
+                parser::get_tname(token), (*yylval->lexinfo).c_str());
         table.intern (yytext);
-        DEBUGF ('r', "table.intern:\t%s\n", yytext);
-
-        //DEBUGF ('r', "token: %d.%d: [%s]\n", linenum, cnt, token);
+        DEBUGF ('r', "%s %lu %lu %lu\n", 
+                yytext, lexer::lloc.filenr, 
+                lexer::lloc.linenr, lexer::lloc.offset);
     }
-/*
-    int pclose_rc = pclose (pipe);
-    //eprint_status (cmd.c_str(), pclose_rc);
-    if (pclose_rc != 0) return -1;
-    return 0;
-*/
+    fclose (tokfile);
 }
 
 void write_str (string_set& table, string& ocname) {
@@ -92,6 +82,7 @@ void write_str (string_set& table, string& ocname) {
 int getoptions (int argc, char* argv[], string& cmd, string& ocname) {
     //  set error print
     opterr = 1;
+    yy_flex_debug = yydebug = 0;
     cmd += CPP;
     int opt;
     while ((opt = getopt (argc, argv, "ly@:D:")) != -1) {
