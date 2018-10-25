@@ -77,3 +77,9 @@ void yyerror (const char* message) {
    errllocprintf (lexer::lloc, "%s\n", message);
 }
 
+int yylval_token (int symbol) {
+    yylval = new astree (symbol, lexer::lloc, yytext);
+    return symbol;
+}
+
+

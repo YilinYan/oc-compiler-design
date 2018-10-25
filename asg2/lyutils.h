@@ -50,5 +50,6 @@ struct parser {
 typedef astree* YYSTYPE;
 #include "yyparse.h"
 
-#endif
+int yylval_token (int symbol);
 
+#endif

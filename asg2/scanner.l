@@ -1,11 +1,12 @@
 %{
 
 #include "lyutils.h"
-
+/*
 int yylval_token (int symbol) {
    yylval = new astree (symbol, lexer::lloc, yytext);
    return symbol;
 }
+*/
 
 %}
 
