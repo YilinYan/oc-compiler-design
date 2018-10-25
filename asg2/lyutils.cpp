@@ -82,7 +82,7 @@ void yyerror (const char* message) {
 }
 
 int yylval_token (int symbol) {
-    lexer::advance();
+//    lexer::advance();
     yylval = new astree (symbol, lexer::lloc, yytext);
     return symbol;
 }

@@ -137,6 +137,7 @@ int main (int argc, char* argv[]) {
         exec::exit_status = EXIT_FAILURE;
     }
     else {
+        exec::execname = ocname;
         string_set table;
         popen_cpp (cmd);
         open_tok (ocname);
