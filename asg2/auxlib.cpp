@@ -1,4 +1,4 @@
-// $Id: auxlib.cpp,v 1.5 2017-10-11 14:28:23-07 - - $
+// $Id: auxlib.cpp,v 1.1 2018-10-25 19:39:59-07 - - $
 
 #include <assert.h>
 #include <errno.h>

@@ -53,11 +53,12 @@ void open_tok (string& ocname) {
 void readlines (string_set& table) {
     int token = 0;
     while ((token = yylex()) != YYEOF) {    
-        
+        /*
         fprintf (tokfile, "%3lu%5lu.%03lu%5d   %-15s%s\n", 
                 yylval->lloc.filenr, yylval->lloc.linenr,
                 yylval->lloc.offset, token,
                 parser::get_tname(token), (*yylval->lexinfo).c_str());
+        */
         table.intern (yytext);
         DEBUGF ('r', "%s %lu %lu %lu\n", 
                 yytext, lexer::lloc.filenr, 

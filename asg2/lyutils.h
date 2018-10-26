@@ -1,4 +1,4 @@
-// $Id: lyutils.h,v 1.11 2017-10-11 14:19:04-07 - - $
+// $Id: lyutils.h,v 1.2 2018-10-25 20:38:58-07 - - $
 
 #ifndef __UTILS_H__
 #define __UTILS_H__
@@ -27,6 +27,7 @@ int yylex();
 int yylex_destroy();
 int yyparse();
 void yyerror (const char* message);
+int yylval_token (int symbol);
 
 struct lexer {
    static bool interactive;
@@ -50,7 +51,5 @@ struct parser {
 #define YYSTYPE_IS_DECLARED
 typedef astree* YYSTYPE;
 #include "yyparse.h"
-
-int yylval_token (int symbol);
 
 #endif

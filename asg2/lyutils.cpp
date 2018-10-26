@@ -1,4 +1,4 @@
-// $Id: lyutils.cpp,v 1.11 2016-10-06 16:42:53-07 - - $
+// $Id: lyutils.cpp,v 1.2 2018-10-25 20:38:58-07 - - $
 
 #include <assert.h>
 #include <ctype.h>
@@ -84,6 +84,10 @@ void yyerror (const char* message) {
 int yylval_token (int symbol) {
 //    lexer::advance();
     yylval = new astree (symbol, lexer::lloc, yytext);
+    fprintf (tokfile, "%3lu%5lu.%03lu%5d  %-15s%s\n",
+            lexer::lloc.filenr, lexer::lloc.linenr,
+            lexer::lloc.offset, symbol,
+            parser::get_tname (symbol), yytext);
     return symbol;
 }
 

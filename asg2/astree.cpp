@@ -1,4 +1,4 @@
-// $Id: astree.cpp,v 1.9 2017-10-04 15:59:50-07 - - $
+// $Id: astree.cpp,v 1.11 2018-10-25 19:53:50-07 - - $
 
 #include <assert.h>
 #include <inttypes.h>
@@ -87,7 +87,7 @@ void errllocprintf (const location& lloc, const char* format,
    assert (sizeof buffer > strlen (format) + strlen (arg));
    snprintf (buffer, sizeof buffer, format, arg);
    //err fix!
-   errprintf ("%s:%zd.%zd: %s", 
-              (*lexer::filename (lloc.filenr)).c_str(), lloc.linenr, lloc.offset,
-              buffer);
+   const string* filename = lexer::filename (lloc.filenr);
+   errprintf ("%s:%zd.%zd: %s", (*filename).c_str(), lloc.linenr, 
+           lloc.offset, buffer);
 }

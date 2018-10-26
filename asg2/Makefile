@@ -19,6 +19,7 @@ CGENS     = ${LEXCPP} ${PARSECPP}
 ALLGENS   = ${PARSEHDR} ${CGENS}
 ALLCSRC   = ${CPPSRC} ${CGENS}
 OBJECTS   = ${ALLCSRC:.cpp=.o}
+ALLSRC    = README Makefile ${HDRSRC} ${CPPSRC} ${FLEXSRC} ${BISONSRC}
 
 all : ${OBJECTS}
 	${CPPWARN} -o oc ${OBJECTS}
@@ -30,6 +31,7 @@ yyparse.o : yyparse.cpp
 	${CPPYY} -c $<
 
 %.o : %.cpp
+	- cpplint.py.perl $<
 	${CPPWARN} -c $<
 
 ${LEXCPP} : ${FLEXSRC}
@@ -38,7 +40,9 @@ ${LEXCPP} : ${FLEXSRC}
 ${PARSECPP} ${PARSEHDR} : ${BISONSRC}
 	${BISON} ${BISONSRC}
 
-ci :
+ci : ${ALLSRC}
+	- checksource ${ALLSRC}
+	cid + ${ALLSRC}
 
 clean :
 	- rm ${OBJECTS} ${ALLGENS} ${DEPSFILE}

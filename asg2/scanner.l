@@ -2,6 +2,7 @@
 
 #include "lyutils.h"
 #define ADVANCE lexer::advance()
+#define RETURN(a) return yylval_token(a)
 
 %}
 
@@ -43,52 +44,52 @@ NOTSTRING       \"{CHARS}*{NOTESCAPE}|\"{CHARS}*
 [ \t]+          { }
 \n              { lexer::newline(); }
 
-"if"            { ADVANCE; return yylval_token (TOK_IF); }
-"else"          { ADVANCE; return yylval_token (TOK_ELSE); }
-"while"         { ADVANCE; return yylval_token (TOK_WHILE); }
-"return"        { ADVANCE; return yylval_token (TOK_RETURN); }
-"int"           { ADVANCE; return yylval_token (TOK_INT); }
-"string"        { ADVANCE; return yylval_token (TOK_STRING); }
-"struct"        { ADVANCE; return yylval_token (TOK_STRUCT); }
-"void"          { ADVANCE; return yylval_token (TOK_VOID); }
-"new"           { ADVANCE; return yylval_token (TOK_NEW); }
-"null"          { ADVANCE; return yylval_token (TOK_NULL); }
-"not"           { ADVANCE; return yylval_token (TOK_NOT); }
+"if"            { ADVANCE; RETURN (TOK_IF); }
+"else"          { ADVANCE; RETURN (TOK_ELSE); }
+"while"         { ADVANCE; RETURN (TOK_WHILE); }
+"return"        { ADVANCE; RETURN (TOK_RETURN); }
+"int"           { ADVANCE; RETURN (TOK_INT); }
+"string"        { ADVANCE; RETURN (TOK_STRING); }
+"struct"        { ADVANCE; RETURN (TOK_STRUCT); }
+"void"          { ADVANCE; RETURN (TOK_VOID); }
+"new"           { ADVANCE; RETURN (TOK_NEW); }
+"null"          { ADVANCE; RETURN (TOK_NULL); }
+"not"           { ADVANCE; RETURN (TOK_NOT); }
 
-{INT}           { ADVANCE; return yylval_token (TOK_INTCON); }
-{IDENT}         { ADVANCE; return yylval_token (TOK_IDENT); }
-{CHAR}          { ADVANCE; return yylval_token (TOK_CHARCON); }
-{STRING}        { ADVANCE; return yylval_token (TOK_STRINGCON); }
+{INT}           { ADVANCE; RETURN (TOK_INTCON); }
+{IDENT}         { ADVANCE; RETURN (TOK_IDENT); }
+{CHAR}          { ADVANCE; RETURN (TOK_CHARCON); }
+{STRING}        { ADVANCE; RETURN (TOK_STRINGCON); }
 
-"+"             { ADVANCE; return yylval_token ('+'); }
-"-"             { ADVANCE; return yylval_token ('-'); }
-"*"             { ADVANCE; return yylval_token ('*'); }
-"/"             { ADVANCE; return yylval_token ('/'); }
-"%"             { ADVANCE; return yylval_token ('%'); }
-"="             { ADVANCE; return yylval_token ('='); }
-"=="            { ADVANCE; return yylval_token (TOK_EQ); }
-"!="            { ADVANCE; return yylval_token (TOK_NE); }
-"<"             { ADVANCE; return yylval_token ('<'); }
-"<="            { ADVANCE; return yylval_token (TOK_LE); }
-">"             { ADVANCE; return yylval_token ('>'); }
-">="            { ADVANCE; return yylval_token (TOK_GE); }
-"->"            { ADVANCE; return yylval_token (TOK_ARROW); }
-","             { ADVANCE; return yylval_token (','); }
-";"             { ADVANCE; return yylval_token (';'); }
-"("             { ADVANCE; return yylval_token ('('); }
-")"             { ADVANCE; return yylval_token (')'); }
-"["             { ADVANCE; return yylval_token ('['); }
-"]"             { ADVANCE; return yylval_token (']'); }
-"{"             { ADVANCE; return yylval_token ('{'); }
-"}"             { ADVANCE; return yylval_token ('}'); }
-"[]"            { ADVANCE; return yylval_token (TOK_ARRAY); }
+"+"             { ADVANCE; RETURN ('+'); }
+"-"             { ADVANCE; RETURN ('-'); }
+"*"             { ADVANCE; RETURN ('*'); }
+"/"             { ADVANCE; RETURN ('/'); }
+"%"             { ADVANCE; RETURN ('%'); }
+"="             { ADVANCE; RETURN ('='); }
+"=="            { ADVANCE; RETURN (TOK_EQ); }
+"!="            { ADVANCE; RETURN (TOK_NE); }
+"<"             { ADVANCE; RETURN ('<'); }
+"<="            { ADVANCE; RETURN (TOK_LE); }
+">"             { ADVANCE; RETURN ('>'); }
+">="            { ADVANCE; RETURN (TOK_GE); }
+"->"            { ADVANCE; RETURN (TOK_ARROW); }
+","             { ADVANCE; RETURN (','); }
+";"             { ADVANCE; RETURN (';'); }
+"("             { ADVANCE; RETURN ('('); }
+")"             { ADVANCE; RETURN (')'); }
+"["             { ADVANCE; RETURN ('['); }
+"]"             { ADVANCE; RETURN (']'); }
+"{"             { ADVANCE; RETURN ('{'); }
+"}"             { ADVANCE; RETURN ('}'); }
+"[]"            { ADVANCE; RETURN (TOK_ARRAY); }
 
 {NOTIDENT}      { ADVANCE; lexer::badtoken (yytext);
-                  return yylval_token (TOK_IDENT); }
+                  RETURN (TOK_IDENT); }
 {NOTCHAR}       { ADVANCE; lexer::badtoken (yytext);
-                  return yylval_token (TOK_CHARCON); }
+                  RETURN (TOK_CHARCON); }
 {NOTSTRING}     { ADVANCE; lexer::badtoken (yytext);
-                  return yylval_token (TOK_STRINGCON); }
-.               { lexer::badchar (*yytext); }
+                  RETURN (TOK_STRINGCON); }
+.               { ADVANCE; lexer::badchar (*yytext); }
 
 %%
