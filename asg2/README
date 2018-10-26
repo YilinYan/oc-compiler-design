@@ -1,0 +1,26 @@
+# compiler design asg2
+Name: Yilin Yan
+Username: yyan228
+
+### All files
+README
+Makefile
+main.cpp
+string_set.h
+string_set.cpp
+auxlib.h
+auxlib.cpp
+lyutils.h
+lyutils.cpp
+astree.h
+astree.cpp
+scanner.l
+parser.y
+
+### SYNOPSIS
+oc [-ly] [-@ flags] [-D string] program.oc
+
+### DEBUG FLAG
+-@ r Enable readlines debug
+-@ o Enable getoptions debug
+-@ w Enable write_str open_tok debug

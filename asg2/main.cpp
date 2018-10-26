@@ -130,9 +130,8 @@ int getoptions (int argc, char* argv[], string& cmd, string& ocname) {
 }
 
 int main (int argc, char* argv[]) {
-    exec::exit_status = EXIT_SUCCESS;
-
     string cmd, ocname;
+    
     int getoptions_rc = getoptions (argc, argv, cmd, ocname);
     if (getoptions_rc != 0) {
         exec::exit_status = EXIT_FAILURE;
