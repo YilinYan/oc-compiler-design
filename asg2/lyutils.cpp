@@ -1,4 +1,4 @@
-// $Id: lyutils.cpp,v 1.2 2018-10-25 20:38:58-07 - - $
+// $Id: lyutils.cpp,v 1.3 2018-10-25 20:50:51-07 - - $
 
 #include <assert.h>
 #include <ctype.h>

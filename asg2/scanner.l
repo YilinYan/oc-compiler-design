@@ -29,14 +29,16 @@ HEXINT          (0[x|X]{HEXDIGIT}+)
 
 INT             ({DECINT}|{OCTINT}|{HEXINT})
 IDENT           ({LETTER}({LETTER}|{DECDIGIT})*)
-CHARS           ([^\\'\n]|\\[\\'"0nt])
-CHAR            ('{CHARS}')
-STRING          (\"{CHARS}\")
+CHARC           ([^\\'\n]|\\[\\'"0nt])
+CHARS           ([^\\"\n]|\\[\\'"0nt])
+CHAR            ('{CHARC}')
+STRING          (\"{CHARS}*\")
 
 NOTESCAPE       (\\[^\\'"0nt])
 NOTIDENT        {DECDIGIT}+{IDENT}
-NOTCHAR         '{NOTESCAPE}'?|'{CHARS}
+NOTCHAR         '{NOTESCAPE}'?|'{CHARC}?
 NOTSTRING       \"{CHARS}*{NOTESCAPE}|\"{CHARS}*
+/*NOTSTRING       \"{CHARS}*[^\"]? */
 
 %%
 
