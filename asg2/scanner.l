@@ -1,7 +1,7 @@
 %{
 
 #include "lyutils.h"
-#define ADVANCE lexer::advance()
+#define YY_USER_ACTION  { lexer::advance(); }
 #define RETURN(a) return yylval_token(a)
 
 %}
@@ -38,7 +38,6 @@ NOTESCAPE       (\\[^\\'"0nt])
 NOTIDENT        {DECDIGIT}+{IDENT}
 NOTCHAR         '{NOTESCAPE}'?|'{CHARC}?
 NOTSTRING       \"{CHARS}*{NOTESCAPE}|\"{CHARS}*
-/*NOTSTRING       \"{CHARS}*[^\"]? */
 
 %%
 
@@ -46,52 +45,52 @@ NOTSTRING       \"{CHARS}*{NOTESCAPE}|\"{CHARS}*
 [ \t]+          { }
 \n              { lexer::newline(); }
 
-"if"            { ADVANCE; RETURN (TOK_IF); }
-"else"          { ADVANCE; RETURN (TOK_ELSE); }
-"while"         { ADVANCE; RETURN (TOK_WHILE); }
-"return"        { ADVANCE; RETURN (TOK_RETURN); }
-"int"           { ADVANCE; RETURN (TOK_INT); }
-"string"        { ADVANCE; RETURN (TOK_STRING); }
-"struct"        { ADVANCE; RETURN (TOK_STRUCT); }
-"void"          { ADVANCE; RETURN (TOK_VOID); }
-"new"           { ADVANCE; RETURN (TOK_NEW); }
-"null"          { ADVANCE; RETURN (TOK_NULL); }
-"not"           { ADVANCE; RETURN (TOK_NOT); }
+"if"            { RETURN (TOK_IF); }
+"else"          { RETURN (TOK_ELSE); }
+"while"         { RETURN (TOK_WHILE); }
+"return"        { RETURN (TOK_RETURN); }
+"int"           { RETURN (TOK_INT); }
+"string"        { RETURN (TOK_STRING); }
+"struct"        { RETURN (TOK_STRUCT); }
+"void"          { RETURN (TOK_VOID); }
+"new"           { RETURN (TOK_NEW); }
+"null"          { RETURN (TOK_NULL); }
+"not"           { RETURN (TOK_NOT); }
 
-{INT}           { ADVANCE; RETURN (TOK_INTCON); }
-{IDENT}         { ADVANCE; RETURN (TOK_IDENT); }
-{CHAR}          { ADVANCE; RETURN (TOK_CHARCON); }
-{STRING}        { ADVANCE; RETURN (TOK_STRINGCON); }
+{INT}           { RETURN (TOK_INTCON); }
+{IDENT}         { RETURN (TOK_IDENT); }
+{CHAR}          { RETURN (TOK_CHARCON); }
+{STRING}        { RETURN (TOK_STRINGCON); }
 
-"+"             { ADVANCE; RETURN ('+'); }
-"-"             { ADVANCE; RETURN ('-'); }
-"*"             { ADVANCE; RETURN ('*'); }
-"/"             { ADVANCE; RETURN ('/'); }
-"%"             { ADVANCE; RETURN ('%'); }
-"="             { ADVANCE; RETURN ('='); }
-"=="            { ADVANCE; RETURN (TOK_EQ); }
-"!="            { ADVANCE; RETURN (TOK_NE); }
-"<"             { ADVANCE; RETURN ('<'); }
-"<="            { ADVANCE; RETURN (TOK_LE); }
-">"             { ADVANCE; RETURN ('>'); }
-">="            { ADVANCE; RETURN (TOK_GE); }
-"->"            { ADVANCE; RETURN (TOK_ARROW); }
-","             { ADVANCE; RETURN (','); }
-";"             { ADVANCE; RETURN (';'); }
-"("             { ADVANCE; RETURN ('('); }
-")"             { ADVANCE; RETURN (')'); }
-"["             { ADVANCE; RETURN ('['); }
-"]"             { ADVANCE; RETURN (']'); }
-"{"             { ADVANCE; RETURN ('{'); }
-"}"             { ADVANCE; RETURN ('}'); }
-"[]"            { ADVANCE; RETURN (TOK_ARRAY); }
+"+"             { RETURN ('+'); }
+"-"             { RETURN ('-'); }
+"*"             { RETURN ('*'); }
+"/"             { RETURN ('/'); }
+"%"             { RETURN ('%'); }
+"="             { RETURN ('='); }
+"=="            { RETURN (TOK_EQ); }
+"!="            { RETURN (TOK_NE); }
+"<"             { RETURN ('<'); }
+"<="            { RETURN (TOK_LE); }
+">"             { RETURN ('>'); }
+">="            { RETURN (TOK_GE); }
+"->"            { RETURN (TOK_ARROW); }
+","             { RETURN (','); }
+";"             { RETURN (';'); }
+"("             { RETURN ('('); }
+")"             { RETURN (')'); }
+"["             { RETURN ('['); }
+"]"             { RETURN (']'); }
+"{"             { RETURN ('{'); }
+"}"             { RETURN ('}'); }
+"[]"            { RETURN (TOK_ARRAY); }
 
-{NOTIDENT}      { ADVANCE; lexer::badtoken (yytext);
+{NOTIDENT}      { lexer::badtoken (yytext);
                   RETURN (TOK_IDENT); }
-{NOTCHAR}       { ADVANCE; lexer::badtoken (yytext);
+{NOTCHAR}       { lexer::badtoken (yytext);
                   RETURN (TOK_CHARCON); }
-{NOTSTRING}     { ADVANCE; lexer::badtoken (yytext);
+{NOTSTRING}     { lexer::badtoken (yytext);
                   RETURN (TOK_STRINGCON); }
-.               { ADVANCE; lexer::badchar (*yytext); }
+.               { lexer::badchar (*yytext); }
 
 %%
