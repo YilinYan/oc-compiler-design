@@ -34,11 +34,13 @@ struct astree {
    void dump_tree (FILE*, int depth = 0);
    static void dump (FILE* outfile, astree* tree);
    static void print (FILE* outfile, astree* tree, int depth = 0);
+   static astree* function_(astree* a, astree* b, astree* c = nullptr);
 };
 
 void destroy (astree* tree1, astree* tree2 = nullptr);
 
 void errllocprintf (const location&, const char* format, const char*);
+
 
 #endif
 
