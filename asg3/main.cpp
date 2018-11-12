@@ -50,21 +50,13 @@ void open_tok (string& ocname) {
     }
 }
 
-void readlines (string_set& table) {
-    int token = 0;
-/*
-    while ((token = yylex()) != YYEOF) {    
-        table.intern (yytext);
-        DEBUGF ('r', "%s %lu %lu %lu\n", 
-                yytext, lexer::lloc.filenr, 
-                lexer::lloc.linenr, lexer::lloc.offset);
-    }
-*/
-    yyparse();
-    
- //   FILE* outfile = fopen ("hhhhhhh", "w");
-    astree::print(stdout, yyparse_astree, 0);
+void readlines (string& ocname) {
+    string outname = ocname + ".ast";
+    FILE* outfile = fopen (outname.c_str(), "w");
 
+    yyparse();
+    astree::print(outfile, yyparse_astree, 0);
+    fclose (outfile);
     fclose (tokfile);
 }
 
@@ -142,7 +134,7 @@ int main (int argc, char* argv[]) {
         string_set table;
         popen_cpp (cmd);
         open_tok (ocname);
-        readlines (table);
+        readlines (ocname);
         pclose_cpp(cmd);
         write_str (table, ocname);
     }

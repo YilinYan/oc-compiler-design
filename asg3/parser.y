@@ -1,5 +1,5 @@
 %{
-// $Id: parser.y,v 1.1 2018-10-25 19:39:59-07 - - $
+// $Id: parser.y,v 1.1 2018-11-12 13:34:46-08 - - $
 // Dummy parser for scanner project.
 
 #include <cassert>
@@ -29,37 +29,36 @@
 %token TOK_ROOT TOK_BLOCK TOK_CALL TOK_IFELSE TOK_INITDECL
 %token TOK_POS TOK_NEG TOK_NEWARRAY TOK_TYPEID TOK_FIELD
 
-/*%token TOK_FUNCTION TOK_PARAMLIST TOK_PROTOTYPE TOK_NEWSTRING*/
-/*%token TOK_INDEX TOK_DECLID TOK_RETURNVOID TOK_VARDECL*/
-
 %token TOK_FUNCTION TOK_PARAM TOK_PROTO TOK_DECLID
-%token TOK_NEWSTR TOK_INDEX
-
-%right TOK_IF TOK_ELSE
-%right '='
-%left  TOK_EQ TOK_NE '<' TOK_LE '>' TOK_GE
-%left  '+' '-'
-%left  '*' '/' '%'
-%right TOK_POS TOK_NEG TOK_NOT TOK_NEW
-%left  TOK_ARRAY TOK_FIELD TOK_FUNCTION
+%token TOK_NEWSTR TOK_INDEX TOK_VARDECL
 
 %start start
 
+%right TOK_IF TOK_ELSE
+%right '='
+%left  TOK_GE TOK_LE TOK_EQ TOK_NE '<' '>'
+%left  '+' '-'
+%left  '*' '/' '%'
+%right TOK_POS TOK_NEG TOK_NOT TOK_NEW
+%left  '[' TOK_ARROW TOK_FUNCTION
+
 %%
+
 start     : program                             { yyparse_astree = $1; }
           ;
 
 program   : program structdef                   { $$ = $1->adopt($2); }
-/*          astree::print (stdout, $$, 0);}*/
           | program function                    { $$ = $1->adopt($2); }
-/*          | program statement   { $$ = $1->adopt($2); }*/
+          | program globaldecl                  { $$ = $1->adopt($2); }
           | program error '}'                   { $$ = $1; }
           | program error ';'                   { $$ = $1; }
           |                                     { $$ = parser::root; }
           ;
 
-structdef : TOK_STRUCT TOK_IDENT '{' '}'        { $$ = $1->adopt($2); }
-          | TOK_STRUCT TOK_IDENT structhaf '}'  { $$ = $1->adopt($2, $3); }
+globaldecl: identdecl '=' constant ';'          { $$ = ($2->change_sym(TOK_VARDECL))->adopt($1, $3); }
+
+structdef : TOK_STRUCT TOK_IDENT '{' '}'        { $$ = $1->adopt_new($2, TOK_TYPEID); }
+          | TOK_STRUCT TOK_IDENT structhaf '}'  { $$ = $1->adopt($2->change_sym(TOK_TYPEID), $3); }
           ;
 
 structhaf : '{' fielddecl ';'                   { $$ = $1->adopt($2); }
@@ -76,10 +75,10 @@ basetype  : TOK_VOID                            { $$ = $1; }
           | TOK_IDENT                           { $$ = $1->change_sym(TOK_TYPEID); }
           ;
 
-function  : TOK_IDENT '(' ')' block             { $$ = astree::function_($1, $2, $4); }
-          | TOK_IDENT param ')' block           { $$ = astree::function_($1, $2, $4); }
-          | TOK_IDENT '(' ')' ';'               { $$ = astree::function_($1, $2); }
-          | TOK_IDENT param ')' ';'             { $$ = astree::function_($1, $2); }
+function  : identdecl '(' ')' fnbody            { $$ = astree::function_($1, $2, $4); }
+          | identdecl param ')' fnbody          { $$ = astree::function_($1, $2, $4); }
+          | identdecl '(' ')' ';'               { $$ = astree::function_($1, $2); }
+          | identdecl param ')' ';'             { $$ = astree::function_($1, $2); }
           ;
 
 param     : param ',' identdecl                 { $$ = $1->adopt($3); }
@@ -88,6 +87,23 @@ param     : param ',' identdecl                 { $$ = $1->adopt($3); }
 
 identdecl : basetype TOK_IDENT                  { $$ = $1->adopt_new($2, TOK_DECLID); }
           | basetype TOK_ARRAY TOK_IDENT        { $$ = $2->adopt($1, $3->change_sym(TOK_DECLID));}
+          ;
+
+fnbody    : '{' '}'                             { $$ = $1; }
+          | fnbodyb '}'                         { $$ = $1; }
+          | fnbodya '}'                         { $$ = $1; }
+          ;
+
+fnbodya   : '{' localdecl                       { $$ = $1->adopt($2); }
+          | fnbodya localdecl                   { $$ = $1->adopt($2); }
+          ;
+
+fnbodyb   : '{' statement                       { $$ = $1->adopt($2); }
+          | fnbodyb statement                   { $$ = $1->adopt($2); }
+          | fnbodya statement                   { $$ = $1->adopt($2); }
+          ;
+
+localdecl : identdecl '=' expr ';'              { $$ = ($2->change_sym(TOK_VARDECL))->adopt($1, $3); }
           ;
 
 block     : '{' '}'                             { $$ = $1->change_sym(TOK_BLOCK); }
@@ -99,23 +115,49 @@ blockhaf  : blockhaf statement                  { $$ = $1->adopt($2); }
           ;
 
 statement : block                               { $$ = $1; }
-/*          | while { $$ = $1; }*/
-/*          | ifelse { $$ = $1; }*/
-/*          | return { $$ = $1; }*/
+          | while                               { $$ = $1; }
+          | ifelse                              { $$ = $1; }
+          | return                              { $$ = $1; }
           | expr ';'                            { $$ = $1; }
           | ';'                                 { $$ = $1; }
           ;
 
-expr      : expr binop expr                     { $$ = $2->adopt($1, $3); }
-          | unop expr                           { $$ = $1->adopt($2); }
+while     : TOK_WHILE '(' expr ')' statement    { $$ = $1->adopt($3, $5); }
+          ;
+
+ifelse    : TOK_IF '(' expr ')' statement       { $$ = $1->adopt($3, $5); }
+          | TOK_IF '(' expr ')' statement TOK_ELSE statement  
+                                                { $$ = ($1->adopt($3, $5))->adopt($7); }
+          ;
+
+return    : TOK_RETURN expr ';'                 { $$ = $1->adopt($2); }
+          | TOK_RETURN ';'                      { $$ = $1; }
+          ;
+
+expr      : expr '=' expr                       { $$ = $2->adopt($1, $3); }              
+          | expr TOK_EQ expr                    { $$ = $2->adopt($1, $3); }             
+          | expr TOK_NE expr                    { $$ = $2->adopt($1, $3); }
+          | expr TOK_LE expr                    { $$ = $2->adopt($1, $3); }
+          | expr TOK_GE expr                    { $$ = $2->adopt($1, $3); }
+          | expr '<' expr                       { $$ = $2->adopt($1, $3); }
+          | expr '>' expr                       { $$ = $2->adopt($1, $3); }
+          | expr '+' expr                       { $$ = $2->adopt($1, $3); }
+          | expr '-' expr                       { $$ = $2->adopt($1, $3); }
+          | expr '*' expr                       { $$ = $2->adopt($1, $3); }
+          | expr '/' expr                       { $$ = $2->adopt($1, $3); }
+          | expr '%' expr                       { $$ = $2->adopt($1, $3); }
+          | '+' expr                            { $$ = $1->adopt_sym($2, TOK_POS); } %prec TOK_POS
+          | '-' expr                            { $$ = $1->adopt_sym($2, TOK_NEG); } %prec TOK_NEG
+          | TOK_NOT expr                        { $$ = $1->adopt($2); }
           | allocation                          { $$ = $1; }
           | call                                { $$ = $1; }
           | '(' expr ')'                        { $$ = $2; }
           | variable                            { $$ = $1; }
           | constant                            { $$ = $1; }
           ;
+
 allocation: TOK_NEW TOK_IDENT                   { $$ = $1->adopt_new($2, TOK_TYPEID); }
-          | TOK_NEW TOK_STRING '(' expr ')'     { $$ = $1->adopt_sym($3, TOK_NEWSTR); }
+          | TOK_NEW TOK_STRING '(' expr ')'     { $$ = $1->adopt_sym($4, TOK_NEWSTR); }
           | TOK_NEW basetype '[' expr ']'       { $$ = ($1->change_sym(TOK_NEWARRAY))->adopt($2, $4); }
           ;
 
@@ -123,7 +165,7 @@ call      : TOK_IDENT '(' ')'                   { $$ = $2->adopt_sym($1, TOK_CAL
           | callhaf ')'                         { $$ = $1; }
           ;
 
-callhaf   : callhaf ',' expr                    { $$ = $1->adopt($2); }
+callhaf   : callhaf ',' expr                    { $$ = $1->adopt($3); }
           | TOK_IDENT '(' expr                  { $$ = ($2->change_sym(TOK_CALL))->adopt($1, $3); }
           ;
 
@@ -137,27 +179,6 @@ constant  : TOK_INTCON                          { $$ = $1; }
           | TOK_STRINGCON                       { $$ = $1; }
           | TOK_NULL                            { $$ = $1; }
           ;
-
-binop     : '='                                 { $$ = $1; }
-          | TOK_EQ                              { $$ = $1; }
-          | TOK_NE                              { $$ = $1; }
-          | TOK_LE                              { $$ = $1; }
-          | '<'                                 { $$ = $1; }
-          | TOK_GE                              { $$ = $1; }
-          | '>'                                 { $$ = $1; }
-          | '+'                                 { $$ = $1; }
-          | '-'                                 { $$ = $1; }
-          | '*'                                 { $$ = $1; }
-          | '/'                                 { $$ = $1; }
-          | '%'                                 { $$ = $1; }
-          ;
-
-unop      : TOK_POS                             { $$ = $1; }
-          | TOK_NEG                             { $$ = $1; }
-          | TOK_NOT                             { $$ = $1; }
-/*        | TOK_NEW                             { $$ = $1; }*/
-          ;
-
 %%
 
 const char *parser::get_tname (int symbol) {
@@ -174,7 +195,7 @@ astree* astree::function_ (astree* a, astree* b, astree *c) {
     func->adopt(a, b);
     if(c != nullptr) {
         func->change_sym(TOK_FUNCTION);
-        func->adopt(c);
+        func->adopt_new(c, TOK_BLOCK);
     }
     return func;
 }
