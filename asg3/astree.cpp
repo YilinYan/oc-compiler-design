@@ -42,6 +42,17 @@ astree* astree::adopt_sym (astree* child, int symbol_) {
    return adopt (child);
 }
 
+astree* astree::adopt_new (astree* child, int symbol_) {
+    child->symbol = symbol_;
+    return adopt (child);
+}
+
+astree* astree::change_sym (int symbol_) {
+    symbol = symbol_;
+    return this;
+}
+
+
 
 void astree::dump_node (FILE* outfile) {
    fprintf (outfile, "%p->{%s %zd.%zd.%zd \"%s\":",
@@ -67,10 +78,15 @@ void astree::dump (FILE* outfile, astree* tree) {
 }
 
 void astree::print (FILE* outfile, astree* tree, int depth) {
-   fprintf (outfile, "; %*s", depth * 3, "");
-   fprintf (outfile, "%s \"%s\" (%zd.%zd.%zd)\n",
-            parser::get_tname (tree->symbol), tree->lexinfo->c_str(),
+   for (int i = 0; i < depth; ++i) {
+       fprintf (outfile, "| %*s", 2, "");
+   }
+   const char* tname = parser::get_tname (tree->symbol);
+   if (strstr (tname, "TOK_") == tname) tname += 4; 
+   fprintf (outfile, "%s \"%s\" %zd.%zd.%zd\n",
+            tname, tree->lexinfo->c_str(),
             tree->lloc.filenr, tree->lloc.linenr, tree->lloc.offset);
+//   printf("%d\n", tree->children.size());
    for (astree* child: tree->children) {
       astree::print (outfile, child, depth + 1);
    }

@@ -22,6 +22,7 @@ extern int yy_flex_debug;
 extern int yydebug;
 extern size_t yyleng; 
 extern FILE* tokfile;
+extern astree* yyparse_astree;
 
 int yylex();
 int yylex_destroy();
