@@ -16,6 +16,9 @@ astree::astree (int symbol_, const location& lloc_, const char* info) {
    lloc = lloc_;
    lexinfo = string_set::intern (info);
    // vector defaults to empty -- no children
+   block_nr = 0;
+   attributes = *(new attr_bitset());
+   symbol_item = nullptr;
 }
 
 astree::~astree() {

@@ -15,6 +15,8 @@ struct location {
    size_t offset;
 };
 
+#include "symbol.h"
+
 struct astree {
 
    // Fields.
@@ -22,6 +24,9 @@ struct astree {
    location lloc;            // source location
    const string* lexinfo;    // pointer to lexical information
    vector<astree*> children; // children of this n-way node
+   size_t block_nr;
+   attr_bitset attributes;
+   symbol_node* symbol_item; 
 
    // Functions.
    astree (int symbol, const location&, const char* lexinfo);
