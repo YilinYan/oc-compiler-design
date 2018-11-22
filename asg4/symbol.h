@@ -32,16 +32,20 @@ struct symbol_node {
     symbol_node(location lloc, size_t nr);
 };
 
+enum class types;
+void type_check(const astree* root, types type);
+void type_set(astree* root, attr attri);
+bool type_test(astree* root, attr attri);
+
 struct symbol_generator {
     symbol_table* structure;
     symbol_table* global;
     symbol_table* local;
     size_t block_nr;
-    
+    symbol_node* func_node;
+
     symbol_generator();
     void generate(astree* root);
 };
 
-enum class types;
-void type_check(const astree* root, types type);
 #endif

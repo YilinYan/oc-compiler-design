@@ -9,6 +9,7 @@ symbol_generator::symbol_generator() {
     global = new symbol_table();
     local = global;
     block_nr = 0;
+    func_node = nullptr;
 }
 
 symbol_node::symbol_node(location l, size_t nr) {
@@ -60,6 +61,58 @@ types type_hash(const char* s) {
     return hash.find(string(s))->second;
 }
 
+void type_set(astree* root, attr attri) {
+    root->attributes.set(static_cast<int> (attri));
+}
+
+bool type_test(const astree* root, attr attri) {
+    return root->attributes.test(static_cast<int> (attri));
+}
+
+void type_check(astree* root, types type) {
+    const astree* a = nullptr;
+    const astree* b = nullptr;
+    if(root->children.size())
+        a = root->children[0];
+    if(root->children.size() > 1)
+        b = root->children[1];
+
+    switch(type) {
+        case types::BINOP:
+            if(type_test(a, attr::INT) &&
+                        type_test(b, attr::INT)) {
+                type_set(root, attr::INT);
+                type_set(root, attr::VREG);
+            }
+            else {
+              //  err_print("incompatible types");
+            }
+            break;
+        case types::UNOP:
+            if(type_test(a, attr::INT)) {
+                type_set(root, attr::INT);
+                type_set(root, attr::VREG);    
+            }
+            else {}
+            break;
+        case types::COMPARE: {
+            int shr = static_cast<int>(attr::BITSET_SIZE) -
+                        static_cast<int>(attr::ARRAY);
+            if(a->attributes>>shr == b->attributes>>shr) {
+                type_set(root, attr::INT);
+                type_set(root, attr::VREG);
+            }
+            else {}
+            break;
+        }
+        case types::RETURN: {
+                                
+        }           
+        default:
+            break;
+    }
+}
+
 void symbol_generator::generate(astree* root) {
 //    symbol_node* node = new symbol_node(root->lloc, block_nr);
     for(const auto& child: root->children) {
@@ -78,15 +131,5 @@ void symbol_generator::generate(astree* root) {
         type_check(root, type_hash(tname));     
     }
 }
-
-void type_check(const astree* root, types type) {
-    switch(type) {
-        case types::BINOP:
-;
-        default:
-;
-    }
-}
-
 
 
