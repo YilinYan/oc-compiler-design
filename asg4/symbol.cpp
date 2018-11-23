@@ -43,11 +43,11 @@ types type_hash(const char* s) {
             {"LE",   types::COMPARE},
             {"GE",   types::COMPARE},
             {"=",       types::ASSIGN},
-            {"VARDECL", types::ASSIGN},
+            {"VARDECL", types::VARDECL},
             {"RETURN", types::RETURN},
-            {"NEW", types::ALLOC},
-            {"NEWSTR", types::ALLOC},
-            {"NEWARRAY", types::ALLOC},
+            {"NEW", types::NEW},
+            {"NEWSTR", types::NEWSTR},
+            {"NEWARRAY", types::NEWARRAY},
             {"IDENT", types::IDENT},
             {"CALL", types::CALL},
             {"INDEX", types::INDEX},
@@ -65,6 +65,10 @@ void type_set(astree* root, attr attri) {
     root->attributes.set(static_cast<int> (attri));
 }
 
+void type_set(astree* root, attr_set& attris) {
+    root->attributes = attris;
+}
+
 bool type_test(const astree* root, attr attri) {
     return root->attributes.test(static_cast<int> (attri));
 }
@@ -77,6 +81,7 @@ void type_check(astree* root, types type) {
     if(root->children.size() > 1)
         b = root->children[1];
 
+    int shr{};
     switch(type) {
         case types::BINOP:
             if(type_test(a, attr::INT) &&
@@ -95,8 +100,8 @@ void type_check(astree* root, types type) {
             }
             else {}
             break;
-        case types::COMPARE: {
-            int shr = static_cast<int>(attr::BITSET_SIZE) -
+        case types::COMPARE:
+            shr = static_cast<int>(attr::BITSET_SIZE) -
                         static_cast<int>(attr::ARRAY);
             if(a->attributes>>shr == b->attributes>>shr) {
                 type_set(root, attr::INT);
@@ -104,10 +109,30 @@ void type_check(astree* root, types type) {
             }
             else {}
             break;
-        }
-        case types::RETURN: {
-                                
-        }           
+        case types::RETURN:
+            //compatible with func
+            break;
+        case types::VARDECL:
+            shr = static_cast<int>(attr::BITSET_SIZE) -
+                        static_cast<int>(attr::ARRAY);
+            if(a->attributes>>shr == b->attributes>>shr) {
+            }
+            else {}
+            break;
+        case types::ASSIGN:
+            shr = static_cast<int>(attr::BITSET_SIZE) -
+                        static_cast<int>(attr::ARRAY);
+            if(a->attributes>>shr == b->attributes>>shr &&
+                    a->attributes.test(attr::LVAL)) {
+                type_set(root, a->attributes);
+                type_set(root, attr::VREG);
+            }
+            else {}
+            break;
+        case types::NEW:
+            type_set(root, a->attributes);
+            type_set(root, attr::VREG);
+            break;
         default:
             break;
     }

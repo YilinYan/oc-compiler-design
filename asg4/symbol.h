@@ -35,6 +35,7 @@ struct symbol_node {
 enum class types;
 void type_check(const astree* root, types type);
 void type_set(astree* root, attr attri);
+void type_set(astree* root, attr_set& attris);
 bool type_test(astree* root, attr attri);
 
 struct symbol_generator {
