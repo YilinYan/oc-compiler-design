@@ -142,8 +142,6 @@ void type_check(astree* root, types type) {
             type_set(root, attr::ARRAY);
             type_set(root, attr::VREG);
             break;
-        case types::CALL:
-            global.find(root-
         default:
             break;
     }
