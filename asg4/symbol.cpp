@@ -21,10 +21,7 @@ symbol_node::symbol_node(location l, size_t nr) {
     parameters = nullptr;
 }
 
-enum class types {
-    BINOP, UNOP, COMPARE, RETURN, ASSIGN, ALLOC, IDENT,
-  CALL, INDEX, FILED, CON  
-};
+enum class types;
 
 types type_hash(const char* s) {
     static const unordered_map<string, types> hash {
@@ -49,13 +46,15 @@ types type_hash(const char* s) {
             {"NEWSTR", types::NEWSTR},
             {"NEWARRAY", types::NEWARRAY},
             {"IDENT", types::IDENT},
-            {"CALL", types::CALL},
+			{"DECLID", types::IDENT},
+			{"TYPEID", types::TYPEID},
+			{"CALL", types::CALL},
             {"INDEX", types::INDEX},
             {"FILED", types::FILED},
-            {"CHARCON", types::CON},
-            {"STRINGCON", types::CON},
-            {"INTCON", types::CON},
-            {"NULL", types::CON}
+            {"CHARCON", types::INTCON},
+            {"STRINGCON", types::STRCON},
+            {"INTCON", types::INTCON},
+            {"NULL", types::NULLCON}
     };
 
     return hash.find(string(s))->second;
@@ -73,10 +72,17 @@ bool type_test(const astree* root, attr attri) {
     return root->attributes.test(static_cast<int> (attri));
 }
 
+bool is_compatible(const attr_set* a, const attr_set* b) {
+	static int shr = static_cast<int>(attr::BITSET_SIZE) -
+                        static_cast<int>(attr::ARRAY);
+    return (a>>shr) == (b>>shr);
+}
+
 void type_check(astree* root, types type) {
     const astree* a = nullptr;
     const astree* b = nullptr;
-    if(root->children.size())
+    symbol_node* found = nullptr;
+	if(root->children.size())
         a = root->children[0];
     if(root->children.size() > 1)
         b = root->children[1];
@@ -101,9 +107,7 @@ void type_check(astree* root, types type) {
             else {}
             break;
         case types::COMPARE:
-            shr = static_cast<int>(attr::BITSET_SIZE) -
-                        static_cast<int>(attr::ARRAY);
-            if(a->attributes>>shr == b->attributes>>shr) {
+            if(is_compatible(a->attributes, b->attributes)) {
                 type_set(root, attr::INT);
                 type_set(root, attr::VREG);
             }
@@ -113,16 +117,12 @@ void type_check(astree* root, types type) {
             //compatible with func
             break;
         case types::VARDECL:
-            shr = static_cast<int>(attr::BITSET_SIZE) -
-                        static_cast<int>(attr::ARRAY);
-            if(a->attributes>>shr == b->attributes>>shr) {
+            if(is_compatible(a->attributes, b->attributes)) {
             }
             else {}
             break;
         case types::ASSIGN:
-            shr = static_cast<int>(attr::BITSET_SIZE) -
-                        static_cast<int>(attr::ARRAY);
-            if(a->attributes>>shr == b->attributes>>shr &&
+            if(is_compatible(a->attributes, b->attributes) &&
                     a->attributes.test(attr::LVAL)) {
                 type_set(root, a->attributes);
                 type_set(root, attr::VREG);
@@ -142,9 +142,72 @@ void type_check(astree* root, types type) {
             type_set(root, attr::ARRAY);
             type_set(root, attr::VREG);
             break;
-        case types::CALL:
-            global.find(root-
-        default:
+        case types::CALL: {
+			auto params = a->symbol_item->parameters;
+			if(params->size() == root->children.size() - 1) {
+				for(auto i = root->children.begin() + 1,
+						auto j = (*params).begin();
+						i < root->children.end(); ++i, ++j) {
+					if(is_compatible(i->attributes, j->attributes)) continue;
+					else {}
+				}
+			}
+		    else{}	
+			break;
+	    }
+		case types::IDENT: {
+			auto found = local->find(string(root->lexinfo));
+			if(found == local->end())
+				found = global->find(string(root->lexinfo));
+			if(found != global->end()) {
+				root->symbol_item = found->second;
+				type_set(root, found->second->attributes);
+			}
+			else{}
+			break;
+		}
+		case types::TYPEID: {
+			auto found = structure->find(string(root->lexinfo));
+			if(found != structure->end()) {
+				root->symbol_item = found->second;
+				type_set(root, found->second->attributes);
+			}
+			else{}
+			break;
+		}
+		case types::INDEX: {
+			int shr = static_cast<int>(attr::BITSET_SIZE) -
+                        static_cast<int>(attr::STRUCT);
+			if((type_test(a, attr::INT) || type_test(a, attr::STRING) || 
+				type_test(a, attr::STRUCT) || type_test(a, attr::VOID)) 
+				&& type_test(a, attr::ARRAY) && type_test(b, attr::INT)) {
+				type_set(root, (a->attributes>>shr)<<shr);
+				type_set(root, attr::VADDR);
+				type_set(root, attr::LVAL);
+			}	
+			else if(type_test(a, attr::STRING) && type_test(b, attr::INT)) {
+				type_set(root, attr::INT);
+				type_set(root, attr::VADDR);
+				type_set(root, attr::LVAL);
+			}
+			else {}			
+	    	break;
+	    }
+		case types::FILED:
+			break;
+		case types::INTCON:
+			type_set(root, attr::INT);
+			type_set(root, atrr::CONST);
+			break;
+		case types::STRCON:
+			type_set(root, attr::STRING);
+			type_set(root, atrr::CONST);
+			break;
+		case types::NULLCON:
+			type_set(root, attr::NULLX);
+			type_set(root, atrr::CONST);
+			break;
+		default:
             break;
     }
 }
