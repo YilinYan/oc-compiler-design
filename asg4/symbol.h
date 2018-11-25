@@ -40,9 +40,9 @@ enum class types {
 
 void type_check(const astree* root, types type);
 void type_set(astree* root, attr attri);
-void type_set(astree* root, attr_set& attris);
+void type_set(astree* root, const attr_bitset& attris);
 bool type_test(const astree* root, attr attri);
-bool is_compatible(const attr_set& a, const attr_set& b);
+bool is_compatible(const attr_bitset& a, const attr_bitset& b);
 
 struct symbol_generator {
     symbol_table* structure;
@@ -53,6 +53,7 @@ struct symbol_generator {
 
     symbol_generator();
     void generate(astree* root);
+    void type_check(astree* root, types type);
 };
 
 #endif

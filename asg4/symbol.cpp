@@ -61,24 +61,24 @@ types type_hash(const char* s) {
 }
 
 void type_set(astree* root, attr attri) {
-    root->attributes.set(static_cast<int> (attri));
+    root->attributes.set(static_cast<size_t> (attri));
 }
 
-void type_set(astree* root, attr_set& attris) {
+void type_set(astree* root, const attr_bitset& attris) {
     root->attributes = attris;
 }
 
 bool type_test(const astree* root, attr attri) {
-    return root->attributes.test(static_cast<int> (attri));
+    return root->attributes.test(static_cast<size_t> (attri));
 }
 
-bool is_compatible(const attr_set* a, const attr_set* b) {
-	static int shr = static_cast<int>(attr::BITSET_SIZE) -
-                        static_cast<int>(attr::ARRAY);
+bool is_compatible(const attr_bitset& a, const attr_bitset& b) {
+	static size_t shr = static_cast<size_t>(attr::BITSET_SIZE) -
+                        static_cast<size_t>(attr::ARRAY);
     return (a>>shr) == (b>>shr);
 }
 
-void type_check(astree* root, types type) {
+void symbol_generator::type_check(astree* root, types type) {
     const astree* a = nullptr;
     const astree* b = nullptr;
     symbol_node* found = nullptr;
@@ -87,7 +87,7 @@ void type_check(astree* root, types type) {
     if(root->children.size() > 1)
         b = root->children[1];
 
-    int shr{};
+    size_t shr{};
     switch(type) {
         case types::BINOP:
             if(type_test(a, attr::INT) &&
@@ -123,7 +123,7 @@ void type_check(astree* root, types type) {
             break;
         case types::ASSIGN:
             if(is_compatible(a->attributes, b->attributes) &&
-                    a->attributes.test(attr::LVAL)) {
+                    type_test(a, attr::LVAL)) {
                 type_set(root, a->attributes);
                 type_set(root, attr::VREG);
             }
@@ -143,12 +143,12 @@ void type_check(astree* root, types type) {
             type_set(root, attr::VREG);
             break;
         case types::CALL: {
-			auto params = a->symbol_item->parameters;
+			vector<symbol_node*>* params = a->symbol_item->parameters;
 			if(params->size() == root->children.size() - 1) {
-				for(auto i = root->children.begin() + 1,
-						auto j = (*params).begin();
-						i < root->children.end(); ++i, ++j) {
-					if(is_compatible(i->attributes, j->attributes)) continue;
+				auto i = root->children.begin() + 1;
+                auto j = params->begin();
+                for(; i < root->children.end(); ++i, ++j) {
+					if(is_compatible((*i)->attributes, (*j)->attributes)) continue;
 					else {}
 				}
 			}
@@ -156,9 +156,9 @@ void type_check(astree* root, types type) {
 			break;
 	    }
 		case types::IDENT: {
-			auto found = local->find(string(root->lexinfo));
+			auto found = local->find(*root->lexinfo);
 			if(found == local->end())
-				found = global->find(string(root->lexinfo));
+				found = global->find(*root->lexinfo);
 			if(found != global->end()) {
 				root->symbol_item = found->second;
 				type_set(root, found->second->attributes);
@@ -167,7 +167,7 @@ void type_check(astree* root, types type) {
 			break;
 		}
 		case types::TYPEID: {
-			auto found = structure->find(string(root->lexinfo));
+			auto found = structure->find(*root->lexinfo);
 			if(found != structure->end()) {
 				root->symbol_item = found->second;
 				type_set(root, found->second->attributes);
@@ -176,8 +176,8 @@ void type_check(astree* root, types type) {
 			break;
 		}
 		case types::INDEX: {
-			int shr = static_cast<int>(attr::BITSET_SIZE) -
-                        static_cast<int>(attr::STRUCT);
+			shr = static_cast<size_t>(attr::BITSET_SIZE) -
+                        static_cast<size_t>(attr::STRUCT);
 			if((type_test(a, attr::INT) || type_test(a, attr::STRING) || 
 				type_test(a, attr::STRUCT) || type_test(a, attr::VOID)) 
 				&& type_test(a, attr::ARRAY) && type_test(b, attr::INT)) {
@@ -197,15 +197,15 @@ void type_check(astree* root, types type) {
 			break;
 		case types::INTCON:
 			type_set(root, attr::INT);
-			type_set(root, atrr::CONST);
+			type_set(root, attr::CONST);
 			break;
 		case types::STRCON:
 			type_set(root, attr::STRING);
-			type_set(root, atrr::CONST);
+			type_set(root, attr::CONST);
 			break;
 		case types::NULLCON:
 			type_set(root, attr::NULLX);
-			type_set(root, atrr::CONST);
+			type_set(root, attr::CONST);
 			break;
 		default:
             break;
