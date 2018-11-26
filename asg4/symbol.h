@@ -45,6 +45,7 @@ struct symbol_generator {
     symbol_table* global;
     symbol_table* local;
     size_t block_nr;
+    size_t block_nxt;
     symbol_node* func_node;
 
     symbol_generator();
@@ -55,7 +56,8 @@ struct symbol_generator {
     symbol_node* ident_decl(
             astree* root, symbol_table* table,
             const string& decl_type, size_t seq = 0); 
- //   symbol_node* field_decl(astree* root, symbol_table* table, int seq); 
+    void func_stmt(astree* root, symbol_table* table);
+    //   symbol_node* field_decl(astree* root, symbol_table* table, int seq); 
 };
 
 void type_check(const astree* root, types type);

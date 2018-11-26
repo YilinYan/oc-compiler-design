@@ -94,6 +94,7 @@ const string attr_to_string (size_t attri) {
             {attr::FIELD      , "field"      },
             {attr::TYPEID     , "typeid"     },
             {attr::PARAM      , "param"      },
+            {attr::LOCAL      , "local"      },
             {attr::LVAL       , "lval"       },
             {attr::CONST      , "const"      },
             {attr::VREG       , "vreg"       },
@@ -118,6 +119,7 @@ void astree::print (FILE* outfile, astree* tree, int depth) {
             tname, tree->lexinfo->c_str(),
             tree->lloc.filenr, tree->lloc.linenr, tree->lloc.offset,
             tree->block_nr);
+   
    for(size_t i = 0; i < static_cast<size_t>(attr::BITSET_SIZE); ++i) {
        if(tree->attributes.test(i)) {
            const char* s = attr_to_string(i).c_str();
@@ -143,7 +145,6 @@ void astree::print (FILE* outfile, astree* tree, int depth) {
    }
    fprintf(outfile, "\n");
 
-//   printf("%d\n", tree->children.size());
    for (astree* child: tree->children) {
       astree::print (outfile, child, depth + 1);
    }

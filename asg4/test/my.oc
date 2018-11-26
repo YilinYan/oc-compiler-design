@@ -11,3 +11,10 @@ struct A {
 }
 
 A a = null;
+
+A f(string b, int a);
+
+A f(string c, int d) {
+    int a = d + 1; 
+    return null;
+}
