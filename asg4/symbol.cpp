@@ -68,20 +68,34 @@ void type_set(astree* root, const attr_bitset& attris) {
     root->attributes = attris;
 }
 
+void type_set(symbol_node* node, attr attri) {
+    node->attributes.set(static_cast<size_t> (attri));
+}
+
 bool type_test(const astree* root, attr attri) {
     return root->attributes.test(static_cast<size_t> (attri));
 }
 
-bool is_compatible(const attr_bitset& a, const attr_bitset& b) {
-    static size_t shr = static_cast<size_t>(attr::BITSET_SIZE) -
-        static_cast<size_t>(attr::ARRAY);
-    return (a>>shr) == (b>>shr);
+bool type_test(const attr_bitset& attrs, attr attri) {
+    return attrs.test(static_cast<size_t> (attri));
 }
 
-void symbol_generator::type_check(astree* root, types type) {
+bool is_compatible(const attr_bitset& a, const attr_bitset& b) {
+    bool rt = false;
+    static size_t shr = static_cast<size_t>(attr::BITSET_SIZE) -
+        static_cast<size_t>(attr::ARRAY);
+    rt |= ((a>>shr) == (b>>shr));
+    rt |= ((type_test(a, attr::ARRAY)
+                || type_test(a, attr::STRUCT)
+                || type_test(a, attr::STRING)
+                ) && type_test(b, attr::NULLX)); 
+    return rt; 
+}
+
+void symbol_generator::type_check(astree* root) {
+    types type = type_hash(root->lexinfo->c_str());
     const astree* a = nullptr;
     const astree* b = nullptr;
-    symbol_node* found = nullptr;
     if(root->children.size())
         a = root->children[0];
     if(root->children.size() > 1)
@@ -96,7 +110,6 @@ void symbol_generator::type_check(astree* root, types type) {
                 type_set(root, attr::VREG);
             }
             else {
-                //  err_print("incompatible types");
             }
             break;
         case types::UNOP:
@@ -115,11 +128,6 @@ void symbol_generator::type_check(astree* root, types type) {
             break;
         case types::RETURN:
             //compatible with func
-            break;
-        case types::VARDECL:
-            if(is_compatible(a->attributes, b->attributes)) {
-            }
-            else {}
             break;
         case types::ASSIGN:
             if(is_compatible(a->attributes, b->attributes) &&
@@ -152,32 +160,17 @@ void symbol_generator::type_check(astree* root, types type) {
                         if(is_compatible((*i)->attributes, (*j)->attributes)) continue;
                         else {}
                     }
-                }
+               }
                 else{}
                 break;
             }
         case types::IDENT: 
-            {
-                auto found = local->find(*root->lexinfo);
-                if(found == local->end())
-                    found = global->find(*root->lexinfo);
-                if(found != global->end()) {
-                    root->symbol_item = found->second;
-                    type_set(root, found->second->attributes);
-                }
-                else{}
-                break;
-            }
+            lookup_var(root);
+            break;
+            
         case types::TYPEID: 
-            {
-                auto found = structure->find(*root->lexinfo);
-                if(found != structure->end()) {
-                    root->symbol_item = found->second;
-                    type_set(root, found->second->attributes);
-                }
-                else{}
-                break;
-            }
+            lookup_struct(root);
+            break;
         case types::INDEX: 
             {
                 shr = static_cast<size_t>(attr::BITSET_SIZE) -
@@ -198,7 +191,18 @@ void symbol_generator::type_check(astree* root, types type) {
                 break;
             }
         case types::FILED:
-            break;
+            {
+                auto i = a->symbol_item->fields->find(*(b->lexinfo)); 
+                if(i != a->symbol_item->fields->end()) {
+                    type_set(root, attr::VADDR);
+                    type_set(root, attr::LVAL);
+                    type_set(root, i->second->attributes);
+                }
+                else
+                    errllocprintf(root->lloc, "no such field in type %s\n", 
+                            a->lexinfo->c_str());
+                break;
+            }
         case types::INTCON:
             type_set(root, attr::INT);
             type_set(root, attr::CONST);
@@ -216,11 +220,101 @@ void symbol_generator::type_check(astree* root, types type) {
     }
 }
 
+attr get_base(const astree* root) {
+    const string& a = *(root->lexinfo);
+    if(a == "int") return attr::INT;
+    else if(a == "string") return attr::STRING;
+    else if(a == "[]") return attr::ARRAY;
+    else if(a == "void") {
+        errllocprintf(root->lloc, 
+                "invalid void type declaration: %s",
+                a.c_str());
+        return attr::VOID;
+    }
+    else return attr::STRUCT;
+}
+
+symbol_node* symbol_generator::lookup_struct(astree* root) {
+    auto type = structure->find(*(root->lexinfo));
+    if(type != structure->end()) {
+        root->symbol_item = type->second;
+        root->attributes = type->second->attributes;
+        return type->second;
+    }
+    errllocprintf(root->lloc, 
+            "no such type: %s",
+            root->lexinfo->c_str());
+    return nullptr;    
+}
+
+symbol_node* symbol_generator::lookup_var(astree* root) {
+    auto type = local->find(*(root->lexinfo));
+    if(type == local->end())
+        type = global->find(*(root->lexinfo));
+    if(type != global->end()) {
+        root->symbol_item = type->second;
+        root->attributes = type->second->attributes;
+        return type->second;
+    }
+    errllocprintf(root->lloc, 
+            "no such variable: %s",
+            root->lexinfo->c_str());
+    return nullptr;
+}
+
+symbol_node* symbol_generator::ident_decl
+(astree* root, symbol_table* table) {
+    astree* l = nullptr;
+    astree* r = nullptr;
+    astree* var = nullptr;
+    if(root->children.size())
+        l = root->children[0];
+    if(root->children.size() > 1)
+        r = root->children[1];
+    symbol_node* symbol = new symbol_node(root->lloc, root->block_nr);
+
+    attr rootbase = get_base(root);
+    type_set(symbol, rootbase);
+    type_set(symbol, attr::VARIABLE);
+    type_set(symbol, attr::LVAL);
+    if(rootbase == attr::STRUCT) {
+        symbol_node* type = lookup_struct(root);
+        symbol->lloc = l->lloc;
+        symbol->fields = type->fields;
+        var = l;
+    }
+    else if(rootbase == attr::ARRAY) {
+        attr lbase = get_base(l);
+        if(lbase == attr::STRUCT) {
+            symbol_node* type = lookup_struct(l);
+            symbol->fields = type->fields;
+        }
+        type_set(symbol, lbase);
+        symbol->lloc = r->lloc;
+        var = r;
+    }
+    else {
+        symbol->lloc = l->lloc;
+        var = l;
+    }
+    
+    table->insert({*(var->lexinfo), symbol});
+    return symbol;
+}
+
 void symbol_generator::generate(astree* root) {
-    //    symbol_node* node = new symbol_node(root->lloc, block_nr);
+    /*
+     * symbol_node* node = new symbol_node(root->lloc, block_nr);
     for(const auto& child: root->children) {
         generate(child);
     }
+    */
+    astree* l = nullptr;
+    astree* r = nullptr;
+    if(root->children.size())
+        l = root->children[0];
+    if(root->children.size() > 1)
+        r = root->children[1];
 
     const char* tname = parser::get_tname (root->symbol);
     if (strstr (tname, "TOK_") == tname) tname += 4;
@@ -230,8 +324,19 @@ void symbol_generator::generate(astree* root) {
     }
     else if (!strcmp(tname, "STRUCT")) {
     }
+    else if(!strcmp(tname, "VARDECL")) {
+        type_check(r);
+        symbol_node* var = ident_decl(l, global);       
+        if(is_compatible(var->attributes, r->attributes))
+            type_set(root, var->attributes);
+        else
+            errllocprintf(root->lloc,
+                    "incompatible types for %s\n", root->lexinfo->c_str());
+    }
     else {
-        type_check(root, type_hash(tname));     
+        errllocprintf(root->lloc, 
+                "symbol_generate: invalid: %s", 
+                root->lexinfo->c_str());
     }
 }
 

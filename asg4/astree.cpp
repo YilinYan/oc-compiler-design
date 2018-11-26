@@ -80,15 +80,56 @@ void astree::dump (FILE* outfile, astree* tree) {
                    else tree->dump_node (outfile);
 }
 
+const string attr_to_string (size_t attri) {
+    attr attribute = static_cast<attr> (attri);
+    static const unordered_map<attr, string> hash {
+        {attr::VOID       , "void"       },
+            {attr::INT        , "int"        },
+            {attr::NULLX      , "null"       },
+            {attr::STRING     , "string"     },
+            {attr::STRUCT     , "struct"     },
+            {attr::ARRAY      , "array"      },
+            {attr::FUNCTION   , "function"   },
+            {attr::VARIABLE   , "variable"   },
+            {attr::FIELD      , "field"      },
+            {attr::TYPEID     , "typeid"     },
+            {attr::PARAM      , "param"      },
+            {attr::LVAL       , "lval"       },
+            {attr::CONST      , "const"      },
+            {attr::VREG       , "vreg"       },
+            {attr::VADDR      , "vaddr"      },
+            {attr::BITSET_SIZE, "bitset_size"},
+    };
+    auto str = hash.find (attribute);
+    if (str == hash.end()) {
+        throw invalid_argument (string (__PRETTY_FUNCTION__) + ": "
+                + to_string (unsigned (attribute)));
+    }
+    return str->second;
+}
+
 void astree::print (FILE* outfile, astree* tree, int depth) {
    for (int i = 0; i < depth; ++i) {
        fprintf (outfile, "| %*s", 2, "");
    }
    const char* tname = parser::get_tname (tree->symbol);
    if (strstr (tname, "TOK_") == tname) tname += 4; 
-   fprintf (outfile, "%s \"%s\" %zd.%zd.%zd\n",
+   fprintf (outfile, "%s \"%s\" %zd.%zd.%zd {%zd}",
             tname, tree->lexinfo->c_str(),
-            tree->lloc.filenr, tree->lloc.linenr, tree->lloc.offset);
+            tree->lloc.filenr, tree->lloc.linenr, tree->lloc.offset,
+            tree->block_nr);
+   for(size_t i = 0; i < static_cast<size_t>(attr::BITSET_SIZE); ++i) {
+       if(tree->attributes.test(i))
+           fprintf(outfile, " %s", attr_to_string(i).c_str());
+   }
+   if(tree->symbol_item != nullptr) {
+       fprintf(outfile, " (%zd.%zd.%zd)", 
+               tree->symbol_item->lloc.filenr,
+               tree->symbol_item->lloc.linenr,
+               tree->symbol_item->lloc.offset);
+   }
+   printf("\n");
+
 //   printf("%d\n", tree->children.size());
    for (astree* child: tree->children) {
       astree::print (outfile, child, depth + 1);
