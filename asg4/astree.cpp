@@ -119,8 +119,18 @@ void astree::print (FILE* outfile, astree* tree, int depth) {
             tree->lloc.filenr, tree->lloc.linenr, tree->lloc.offset,
             tree->block_nr);
    for(size_t i = 0; i < static_cast<size_t>(attr::BITSET_SIZE); ++i) {
-       if(tree->attributes.test(i))
+       if(tree->attributes.test(i)) {
+           const char* s = attr_to_string(i).c_str();
            fprintf(outfile, " %s", attr_to_string(i).c_str());
+           
+           if(!strcmp(s, "struct")) {
+               if(tree->symbol_item == nullptr) {
+               //     cout << *(tree->lexinfo) << endl;
+               }
+               else
+               fprintf(outfile, " \"%s\"", tree->symbol_item->type_name.c_str());
+           }
+       }
    }
    if(tree->symbol_item != nullptr) {
        fprintf(outfile, " (%zd.%zd.%zd)", 

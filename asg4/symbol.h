@@ -28,6 +28,7 @@ struct symbol_node {
     location lloc;
     size_t block_nr;
     vector<symbol_node*>* parameters;
+    string type_name;
 
     symbol_node(location lloc, size_t nr);
     symbol_node();
@@ -52,6 +53,7 @@ struct symbol_generator {
     symbol_node* lookup_struct(astree* root);
     symbol_node* lookup_var(astree* root);
     symbol_node* ident_decl(astree* root, symbol_table* table); 
+    symbol_node* field_decl(astree* root, symbol_table* table, int seq); 
 };
 
 void type_check(const astree* root, types type);

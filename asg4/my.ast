@@ -1,22 +1,28 @@
 ROOT "" 0.0.0 {0}
-|   VARDECL "=" 6.3.8 {0} int array variable lval
+|   VARDECL "=" 6.3.8 {0}
 |   |   ARRAY "[]" 6.3.3 {0}
 |   |   |   INT "int" 6.3.0 {0}
 |   |   |   DECLID "b" 6.3.6 {0} int array variable lval (6.3.6)
 |   |   NULL "null" 6.3.10 {0} null const
-|   VARDECL "=" 6.4.9 {0} string variable lval
+|   VARDECL "=" 6.4.9 {0}
 |   |   STRING "string" 6.4.0 {0}
-|   |   |   DECLID "b" 6.4.7 {0} string variable lval (6.4.7)
+|   |   |   DECLID "c" 6.4.7 {0} string variable lval (6.4.7)
 |   |   STRINGCON ""hhhhh"" 6.4.11 {0} string const
-|   VARDECL "=" 6.5.6 {0} int variable lval
+|   VARDECL "=" 6.5.6 {0}
 |   |   INT "int" 6.5.0 {0}
 |   |   |   DECLID "a" 6.5.4 {0} int variable lval (6.5.4)
 |   |   INTCON "3" 6.5.8 {0} int const
-|   VARDECL "=" 6.6.6 {0} int variable lval
-|   |   INT "int" 6.6.0 {0}
-|   |   |   DECLID "b" 6.6.4 {0} int variable lval (6.6.4)
-|   |   INTCON "8" 6.6.8 {0} int const
-|   VARDECL "=" 6.7.6 {0} int variable lval
-|   |   INT "int" 6.7.0 {0}
-|   |   |   DECLID "c" 6.7.4 {0} int variable lval (6.7.4)
-|   |   INTCON "10000" 6.7.8 {0} int const
+|   STRUCT "struct" 6.7.0 {0}
+|   |   TYPEID "A" 6.7.7 {0} struct "A" typeid (6.7.7)
+|   |   '{' "{" 6.7.9 {0}
+|   |   |   INT "int" 6.8.4 {0}
+|   |   |   |   FIELD "b" 6.8.8 {0} int field (6.8.8)
+|   |   |   ARRAY "[]" 6.9.10 {0}
+|   |   |   |   STRING "string" 6.9.4 {0}
+|   |   |   |   FIELD "c" 6.9.13 {0} string array field (6.9.13)
+|   |   |   TYPEID "A" 6.10.4 {0} struct "A" typeid (6.7.7)
+|   |   |   |   FIELD "ddd" 6.10.6 {0} struct "A" field (6.10.6)
+|   VARDECL "=" 6.13.4 {0}
+|   |   TYPEID "A" 6.13.0 {0} struct "A" typeid (6.7.7)
+|   |   |   DECLID "a" 6.13.2 {0} struct "A" variable lval (6.13.2)
+|   |   NULL "null" 6.13.6 {0} null const
