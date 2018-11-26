@@ -121,6 +121,9 @@ void astree::print (FILE* outfile, astree* tree, int depth) {
    for(size_t i = 0; i < static_cast<size_t>(attr::BITSET_SIZE); ++i) {
        if(tree->attributes.test(i)) {
            const char* s = attr_to_string(i).c_str();
+           
+           if(!strcmp(s, "typeid")) continue;
+
            fprintf(outfile, " %s", attr_to_string(i).c_str());
            
            if(!strcmp(s, "struct")) {

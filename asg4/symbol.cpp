@@ -283,7 +283,7 @@ void table_insert(const string& s, symbol_node* node, symbol_table* table) {
 }
 
 symbol_node* symbol_generator::ident_decl
-(astree* root, symbol_table* table) {
+(astree* root, symbol_table* table, const string& decl_type, size_t seq) {
     astree* l = nullptr;
     astree* r = nullptr;
     astree* var = nullptr;
@@ -295,8 +295,30 @@ symbol_node* symbol_generator::ident_decl
 
     attr rootbase = get_base(root);
     type_set(symbol, rootbase);
-    type_set(symbol, attr::VARIABLE);
-    type_set(symbol, attr::LVAL);
+    if(decl_type == "ident") {
+        type_set(symbol, attr::VARIABLE);
+        type_set(symbol, attr::LVAL);
+    }
+    else if(decl_type == "func") {
+        // insert or get proto 
+        type_set(symbol, attr::FUNCTION);       
+    }
+    else if(decl_type == "field") {
+        type_set(symbol, attr::FIELD);
+    }
+    else if(decl_type == "param") {
+        symbol->block_nr = root->block_nr = block_nr;
+        type_set(symbol, attr::VARIABLE);
+        type_set(symbol, attr::PARAM);
+        type_set(symbol, attr::LVAL);
+    }
+    else if(decl_type == "local") {
+        symbol->block_nr = root->block_nr = block_nr;
+        type_set(symbol, attr::VARIABLE);
+        type_set(symbol, attr::LOCAL);
+        type_set(symbol, attr::LVAL);
+    }
+
     if(rootbase == attr::STRUCT) {
         symbol_node* type = lookup_struct(root);
         if(type == nullptr) {
@@ -325,7 +347,8 @@ symbol_node* symbol_generator::ident_decl
         symbol->lloc = l->lloc;
         var = l;
     }
-    
+ 
+    symbol->sequence = seq;   
     var->block_nr = root->block_nr;
     var->symbol_item = symbol;
     var->attributes = symbol->attributes;
@@ -333,7 +356,7 @@ symbol_node* symbol_generator::ident_decl
     table_insert(*(var->lexinfo), symbol, table);
     return symbol;
 }
-
+/*
 symbol_node* symbol_generator::field_decl
 (astree* root, symbol_table* table, int seq) {
     astree* l = nullptr;
@@ -386,6 +409,59 @@ symbol_node* symbol_generator::field_decl
     return symbol;
 }
 
+symbol_node* symbol_generator::local_decl
+(astree* root, symbol_table* table, size_t seq) {
+    astree* l = nullptr;
+    astree* r = nullptr;
+    astree* var = nullptr;
+    if(root->children.size())
+        l = root->children[0];
+    if(root->children.size() > 1)
+        r = root->children[1];
+    symbol_node* symbol = new symbol_node(root->lloc, root->block_nr);
+
+    attr rootbase = get_base(root);
+    type_set(symbol, rootbase);
+    type_set(symbol, attr::VARIABLE);
+    type_set(symbol, attr::LVAL);
+    if(rootbase == attr::STRUCT) {
+        symbol_node* type = lookup_struct(root);
+        if(type == nullptr) {
+            return nullptr;
+        }
+        symbol->lloc = l->lloc;
+        symbol->fields = type->fields;
+        symbol->type_name = type->type_name;
+        var = l;
+    }
+    else if(rootbase == attr::ARRAY) {
+        attr lbase = get_base(l);
+        if(lbase == attr::STRUCT) {
+            symbol_node* type = lookup_struct(l);
+            if(type == nullptr) {
+                return nullptr;
+            }
+            symbol->fields = type->fields;
+            symbol->type_name = type->type_name;
+        }
+        type_set(symbol, lbase);
+        symbol->lloc = r->lloc;
+        var = r;
+    }
+    else {
+        symbol->lloc = l->lloc;
+        var = l;
+    }
+    
+    symbol->sequence = seq;
+    var->block_nr = root->block_nr;
+    var->symbol_item = symbol;
+    var->attributes = symbol->attributes;
+
+    table_insert(*(var->lexinfo), symbol, table);
+    return symbol;
+}
+*/
 
 void print_attr(attr_bitset& attrs, const string& name) {
     for(size_t i = 0; i < static_cast<size_t>(attr::BITSET_SIZE); ++i) {
@@ -414,8 +490,33 @@ void symbol_generator::generate(astree* root) {
     root->block_nr = block_nr;
 
     if (!strcmp(tname, "FUNCTION")) {
+        symbol_node* func = ident_decl(l, global, "func", -1);
+
+        if(func != nullptr) {
+            symbol_table* table = new symbol_table();
+            ++block_nr;
+            int j = 0;
+            for(auto i = r->children.begin();
+                    i != r->children.end(); ++i, ++j) {
+                symbol_node* para = ident_decl(*i, table, "param", j);
+                func->parameters->push_back(para);
+            }
+        }
     }
     else if(!strcmp(tname, "PROTO")) {
+        symbol_node* func = ident_decl(l, global, "func", -1);
+
+        if(func != nullptr) {
+            symbol_table* table = new symbol_table();
+
+            ++block_nr;
+            int j = 0;
+            for(auto i = r->children.begin();
+                    i != r->children.end(); ++i, ++j) {
+                symbol_node* para = ident_decl(*i, table, "param", j);
+                func->parameters->push_back(para);
+            }
+        }
     }
     else if (!strcmp(tname, "STRUCT")) {
         symbol_table* table = new symbol_table();
@@ -433,12 +534,12 @@ void symbol_generator::generate(astree* root) {
         int j = 0;
         for(auto i = r->children.begin();
                 i != r->children.end(); ++i, ++j) {
-            field_decl(*i, table, j);
+            ident_decl(*i, table, "field", j);
         }
     }
     else if(!strcmp(tname, "VARDECL")) {       
         type_check(r);
-        symbol_node* var = ident_decl(l, global);       
+        symbol_node* var = ident_decl(l, global, "ident", -1);       
         if(var == nullptr) {
         }
         else if(is_compatible(var->attributes, r->attributes)){
