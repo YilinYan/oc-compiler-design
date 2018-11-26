@@ -1,0 +1,7 @@
+// $Id: 03-test3.oc,v 1.8 2018-04-17 16:55:18-07 - - $
+
+int[] b = null;
+string b = "hhhhh";
+int a = 3;
+int b = 8;
+int c = 10000;

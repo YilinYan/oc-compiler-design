@@ -1,0 +1,22 @@
+ROOT "" 0.0.0 {0}
+|   VARDECL "=" 6.3.8 {0} int array variable lval
+|   |   ARRAY "[]" 6.3.3 {0}
+|   |   |   INT "int" 6.3.0 {0}
+|   |   |   DECLID "b" 6.3.6 {0} int array variable lval (6.3.6)
+|   |   NULL "null" 6.3.10 {0} null const
+|   VARDECL "=" 6.4.9 {0} string variable lval
+|   |   STRING "string" 6.4.0 {0}
+|   |   |   DECLID "b" 6.4.7 {0} string variable lval (6.4.7)
+|   |   STRINGCON ""hhhhh"" 6.4.11 {0} string const
+|   VARDECL "=" 6.5.6 {0} int variable lval
+|   |   INT "int" 6.5.0 {0}
+|   |   |   DECLID "a" 6.5.4 {0} int variable lval (6.5.4)
+|   |   INTCON "3" 6.5.8 {0} int const
+|   VARDECL "=" 6.6.6 {0} int variable lval
+|   |   INT "int" 6.6.0 {0}
+|   |   |   DECLID "b" 6.6.4 {0} int variable lval (6.6.4)
+|   |   INTCON "8" 6.6.8 {0} int const
+|   VARDECL "=" 6.7.6 {0} int variable lval
+|   |   INT "int" 6.7.0 {0}
+|   |   |   DECLID "c" 6.7.4 {0} int variable lval (6.7.4)
+|   |   INTCON "10000" 6.7.8 {0} int const

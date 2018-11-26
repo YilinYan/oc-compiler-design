@@ -55,7 +55,10 @@ void readlines (string& ocname) {
     FILE* outfile = fopen (outname.c_str(), "w");
 
     yyparse();
+    symbol_generator* generator = new symbol_generator();
+    generator->generate(yyparse_astree);
     astree::print(outfile, yyparse_astree, 0);
+    
     fclose (outfile);
     fclose (tokfile);
 }

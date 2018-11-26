@@ -128,7 +128,7 @@ void astree::print (FILE* outfile, astree* tree, int depth) {
                tree->symbol_item->lloc.linenr,
                tree->symbol_item->lloc.offset);
    }
-   printf("\n");
+   fprintf(outfile, "\n");
 
 //   printf("%d\n", tree->children.size());
    for (astree* child: tree->children) {

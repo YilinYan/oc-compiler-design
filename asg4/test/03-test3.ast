@@ -1,0 +1,85 @@
+ROOT "" 0.0.0 {0}
+|   PROTO "" 8.30.0 {0}
+|   |   VOID "void" 8.30.0 {0}
+|   |   |   DECLID "__assert_fail" 8.30.5 {0}
+|   |   PARAM "(" 8.30.19 {0}
+|   |   |   STRING "string" 8.30.20 {0}
+|   |   |   |   DECLID "expr" 8.30.27 {0}
+|   |   |   STRING "string" 8.30.33 {0}
+|   |   |   |   DECLID "file" 8.30.40 {0}
+|   |   |   INT "int" 8.30.46 {0}
+|   |   |   |   DECLID "line" 8.30.50 {0}
+|   |   |   STRING "string" 8.30.56 {0}
+|   |   |   |   DECLID "func" 8.30.63 {0}
+|   PROTO "" 8.31.0 {0}
+|   |   VOID "void" 8.31.0 {0}
+|   |   |   DECLID "putchar" 8.31.5 {0}
+|   |   PARAM "(" 8.31.13 {0}
+|   |   |   INT "int" 8.31.14 {0}
+|   |   |   |   DECLID "c" 8.31.18 {0}
+|   PROTO "" 8.32.0 {0}
+|   |   VOID "void" 8.32.0 {0}
+|   |   |   DECLID "putint" 8.32.5 {0}
+|   |   PARAM "(" 8.32.12 {0}
+|   |   |   INT "int" 8.32.13 {0}
+|   |   |   |   DECLID "i" 8.32.17 {0}
+|   PROTO "" 8.33.0 {0}
+|   |   VOID "void" 8.33.0 {0}
+|   |   |   DECLID "putstr" 8.33.5 {0}
+|   |   PARAM "(" 8.33.12 {0}
+|   |   |   STRING "string" 8.33.13 {0}
+|   |   |   |   DECLID "s" 8.33.20 {0}
+|   PROTO "" 8.34.0 {0}
+|   |   INT "int" 8.34.0 {0}
+|   |   |   DECLID "getchar" 8.34.4 {0}
+|   |   PARAM "(" 8.34.11 {0}
+|   PROTO "" 8.35.0 {0}
+|   |   STRING "string" 8.35.0 {0}
+|   |   |   DECLID "getword" 8.35.7 {0}
+|   |   PARAM "(" 8.35.14 {0}
+|   PROTO "" 8.36.0 {0}
+|   |   STRING "string" 8.36.0 {0}
+|   |   |   DECLID "getln" 8.36.7 {0}
+|   |   PARAM "(" 8.36.12 {0}
+|   PROTO "" 8.37.0 {0}
+|   |   VOID "void" 8.37.0 {0}
+|   |   |   DECLID "endl" 8.37.5 {0}
+|   |   PARAM "(" 8.37.9 {0}
+|   PROTO "" 8.38.0 {0}
+|   |   VOID "void" 8.38.0 {0}
+|   |   |   DECLID "exit" 8.38.5 {0}
+|   |   PARAM "(" 8.38.10 {0}
+|   |   |   INT "int" 8.38.11 {0}
+|   |   |   |   DECLID "status" 8.38.15 {0}
+|   FUNCTION "" 9.5.0 {0}
+|   |   INT "int" 9.5.0 {0}
+|   |   |   DECLID "main" 9.5.4 {0}
+|   |   PARAM "(" 9.5.8 {0}
+|   |   BLOCK "{" 9.5.11 {0}
+|   |   |   VARDECL "=" 9.6.9 {0}
+|   |   |   |   INT "int" 9.6.3 {0}
+|   |   |   |   |   DECLID "a" 9.6.7 {0}
+|   |   |   |   INTCON "3" 9.6.11 {0}
+|   |   |   VARDECL "=" 9.7.9 {0}
+|   |   |   |   INT "int" 9.7.3 {0}
+|   |   |   |   |   DECLID "b" 9.7.7 {0}
+|   |   |   |   INTCON "8" 9.7.11 {0}
+|   |   |   VARDECL "=" 9.8.9 {0}
+|   |   |   |   INT "int" 9.8.3 {0}
+|   |   |   |   |   DECLID "c" 9.8.7 {0}
+|   |   |   |   '+' "+" 9.8.13 {0}
+|   |   |   |   |   IDENT "a" 9.8.11 {0}
+|   |   |   |   |   IDENT "b" 9.8.15 {0}
+|   |   |   '=' "=" 9.9.5 {0}
+|   |   |   |   IDENT "a" 9.9.3 {0}
+|   |   |   |   '+' "+" 9.9.9 {0}
+|   |   |   |   |   IDENT "b" 9.9.7 {0}
+|   |   |   |   |   IDENT "c" 9.9.11 {0}
+|   |   |   CALL "(" 9.10.10 {0}
+|   |   |   |   IDENT "putint" 9.10.3 {0}
+|   |   |   |   IDENT "a" 9.10.11 {0}
+|   |   |   CALL "(" 9.11.11 {0}
+|   |   |   |   IDENT "putchar" 9.11.3 {0}
+|   |   |   |   CHARCON "'\n'" 9.11.12 {0}
+|   |   |   RETURN "return" 9.12.3 {0}
+|   |   |   |   INTCON "0" 9.12.10 {0}

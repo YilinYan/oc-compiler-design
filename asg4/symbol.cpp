@@ -1,4 +1,5 @@
 #include <string.h>
+#include <iostream>
 
 #include "astree.h"
 #include "lyutils.h"
@@ -22,6 +23,7 @@ symbol_node::symbol_node(location l, size_t nr) {
 }
 
 enum class types;
+const string attr_to_string (size_t attri);
 
 types type_hash(const char* s) {
     static const unordered_map<string, types> hash {
@@ -56,8 +58,12 @@ types type_hash(const char* s) {
             {"INTCON", types::INTCON},
             {"NULL", types::NULLCON}
     };
+    auto iter = hash.find(string(s));
+    if(iter != hash.end())
+        return iter->second;
 
-    return hash.find(string(s))->second;
+    throw invalid_argument (string (__PRETTY_FUNCTION__) + ": "
+            + string (s));       
 }
 
 void type_set(astree* root, attr attri) {
@@ -84,7 +90,7 @@ bool is_compatible(const attr_bitset& a, const attr_bitset& b) {
     bool rt = false;
     static size_t shr = static_cast<size_t>(attr::BITSET_SIZE) -
         static_cast<size_t>(attr::ARRAY);
-    rt |= ((a>>shr) == (b>>shr));
+    rt |= ((a<<shr) == (b<<shr));
     rt |= ((type_test(a, attr::ARRAY)
                 || type_test(a, attr::STRUCT)
                 || type_test(a, attr::STRING)
@@ -93,7 +99,10 @@ bool is_compatible(const attr_bitset& a, const attr_bitset& b) {
 }
 
 void symbol_generator::type_check(astree* root) {
-    types type = type_hash(root->lexinfo->c_str());
+    const char* tname = parser::get_tname (root->symbol);
+    if (strstr (tname, "TOK_") == tname) tname += 4;
+    types type = type_hash(tname);
+        
     const astree* a = nullptr;
     const astree* b = nullptr;
     if(root->children.size())
@@ -178,7 +187,7 @@ void symbol_generator::type_check(astree* root) {
                 if((type_test(a, attr::INT) || type_test(a, attr::STRING) || 
                             type_test(a, attr::STRUCT) || type_test(a, attr::VOID)) 
                         && type_test(a, attr::ARRAY) && type_test(b, attr::INT)) {
-                    type_set(root, (a->attributes>>shr)<<shr);
+                    type_set(root, (a->attributes<<shr)>>shr);
                     type_set(root, attr::VADDR);
                     type_set(root, attr::LVAL);
                 }
@@ -218,6 +227,7 @@ void symbol_generator::type_check(astree* root) {
         default:
             break;
     }
+
 }
 
 attr get_base(const astree* root) {
@@ -262,6 +272,15 @@ symbol_node* symbol_generator::lookup_var(astree* root) {
     return nullptr;
 }
 
+void table_insert(const string& s, symbol_node* node, symbol_table* table) {
+    auto i = table->find(s);
+    if(i == table->end()) {
+        table->insert({s, node});
+        return;
+    }
+    errllocprintf(node->lloc, "duplicate variable %s\n", s.c_str()); 
+}
+
 symbol_node* symbol_generator::ident_decl
 (astree* root, symbol_table* table) {
     astree* l = nullptr;
@@ -298,17 +317,24 @@ symbol_node* symbol_generator::ident_decl
         var = l;
     }
     
-    table->insert({*(var->lexinfo), symbol});
+    var->block_nr = root->block_nr;
+    var->symbol_item = symbol;
+    var->attributes = symbol->attributes;
+
+    table_insert(*(var->lexinfo), symbol, table);
     return symbol;
 }
 
+void print_attr(attr_bitset& attrs) {
+   for(size_t i = 0; i < static_cast<size_t>(attr::BITSET_SIZE); ++i) {
+       if(attrs.test(i))
+           printf(" %s", attr_to_string(i).c_str());
+   }
+   printf("\n");
+}
+
 void symbol_generator::generate(astree* root) {
-    /*
-     * symbol_node* node = new symbol_node(root->lloc, block_nr);
-    for(const auto& child: root->children) {
-        generate(child);
-    }
-    */
+    
     astree* l = nullptr;
     astree* r = nullptr;
     if(root->children.size())
@@ -322,20 +348,31 @@ void symbol_generator::generate(astree* root) {
 
     if (!strcmp(tname, "FUNCTION")) {
     }
+    else if(!strcmp(tname, "PROTO")) {
+    }
     else if (!strcmp(tname, "STRUCT")) {
     }
-    else if(!strcmp(tname, "VARDECL")) {
+    else if(!strcmp(tname, "VARDECL")) {       
         type_check(r);
+
         symbol_node* var = ident_decl(l, global);       
         if(is_compatible(var->attributes, r->attributes))
             type_set(root, var->attributes);
-        else
+        else {
             errllocprintf(root->lloc,
                     "incompatible types for %s\n", root->lexinfo->c_str());
+            print_attr(var->attributes);
+            print_attr(r->attributes);
+        }
+    }
+    else if(!strcmp(tname, "ROOT")) {
+        for(auto i = root->children.begin();
+                i != root->children.end(); ++i)
+            generate(*i);
     }
     else {
         errllocprintf(root->lloc, 
-                "symbol_generate: invalid: %s", 
+                "symbol_generate: invalid: %s\n", 
                 root->lexinfo->c_str());
     }
 }
