@@ -1,4 +1,4 @@
-# compiler design asg3
+# compiler design asg4
 Name: Yilin Yan
 Username: yyan228
 
@@ -14,6 +14,8 @@ lyutils.h
 lyutils.cpp
 astree.h
 astree.cpp
+symbol.h
+symbol.cpp
 scanner.l
 parser.y
 

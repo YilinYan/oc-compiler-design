@@ -53,13 +53,16 @@ void open_tok (string& ocname) {
 void readlines (string& ocname) {
     string outname = ocname + ".ast";
     FILE* outfile = fopen (outname.c_str(), "w");
+    string symbol_outname = ocname + ".sym";
+    FILE* symbol_outfile = fopen(symbol_outname.c_str(), "w");
 
     yyparse();
-    symbol_generator* generator = new symbol_generator();
+    symbol_generator* generator = new symbol_generator(symbol_outfile);
     generator->generate(yyparse_astree);
     astree::print(outfile, yyparse_astree, 0);
     
     fclose (outfile);
+    fclose (symbol_outfile);
     fclose (tokfile);
 }
 
