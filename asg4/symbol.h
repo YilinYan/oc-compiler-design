@@ -38,8 +38,8 @@ struct symbol_node {
 
 enum class types {
     BINOP, UNOP, COMPARE, RETURN, VARDECL, ASSIGN,
-	NEW, NEWSTR, NEWARRAY, IDENT, TYPEID, 
-  	CALL, INDEX, FILED, INTCON, STRCON, NULLCON,
+    NEW, NEWSTR, NEWARRAY, IDENT, TYPEID,
+    CALL, INDEX, FILED, INTCON, STRCON, NULLCON,
     NOMATTER
 };
 
@@ -62,7 +62,8 @@ struct symbol_generator {
             astree* root, symbol_table* table,
             const string& decl_type, size_t seq = 0); 
     void func_stmt(astree* root, symbol_table* table);
-    //   symbol_node* field_decl(astree* root, symbol_table* table, int seq); 
+    //   symbol_node* field_decl(astree* root, 
+    //   symbol_table* table, int seq); 
 };
 
 void type_check(const astree* root, types type);
@@ -73,6 +74,7 @@ bool type_test(const astree* root, attr attri);
 bool type_test(const attr_bitset& attrs, attr attri);
 bool is_compatible(const attr_bitset& a, const attr_bitset& b);
 attr get_base(const astree* root);
-const string attrs_to_string(const attr_bitset& attrs, const string& name);
+const string attrs_to_string(const attr_bitset& attrs, 
+        const string& name);
 
 #endif

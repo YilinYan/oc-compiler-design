@@ -1,4 +1,4 @@
-// $Id: astree.cpp,v 1.1 2018-11-12 13:34:46-08 - - $
+// $Id: astree.cpp,v 1.2 2018-11-26 17:42:48-08 - - $
 
 #include <assert.h>
 #include <inttypes.h>
@@ -133,7 +133,8 @@ void astree::print (FILE* outfile, astree* tree, int depth) {
                //     cout << *(tree->lexinfo) << endl;
                }
                else
-               fprintf(outfile, " \"%s\"", tree->symbol_item->type_name.c_str());
+               fprintf(outfile, " \"%s\"", 
+                       tree->symbol_item->type_name.c_str());
            }
        }
    }
