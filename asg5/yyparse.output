@@ -20,10 +20,10 @@ Terminals unused in grammar
    TOK_VARDECL
 
 
-State 91 conflicts: 1 reduce/reduce
+状态 91conflicts: 1 reduce/reduce
 
 
-Grammar
+语法
 
     0 $accept: start $end
 
@@ -267,8 +267,8 @@ State 0
 
     $default  reduce using rule 7 (program)
 
-    start    go to state 1
-    program  go to state 2
+    start    转到状态 1
+    program  转到状态 2
 
 
 State 1
@@ -296,18 +296,18 @@ State 2
 
     $end  reduce using rule 1 (start)
 
-    globaldecl  go to state 10
-    structdef   go to state 11
-    basetype    go to state 12
-    function    go to state 13
-    identdecl   go to state 14
+    globaldecl  转到状态 10
+    structdef   转到状态 11
+    basetype    转到状态 12
+    function    转到状态 13
+    identdecl   转到状态 14
 
 
 State 3
 
     0 $accept: start $end .
 
-    $default  accept
+    $default  接受
 
 
 State 4
@@ -396,7 +396,7 @@ State 14
     '='  shift, and go to state 20
     '('  shift, and go to state 21
 
-    param  go to state 22
+    param  转到状态 22
 
 
 State 15
@@ -420,7 +420,7 @@ State 17
 
     '{'  shift, and go to state 23
 
-    structhaf  go to state 24
+    structhaf  转到状态 24
 
 
 State 18
@@ -446,7 +446,7 @@ State 20
     TOK_CHARCON    shift, and go to state 28
     TOK_STRINGCON  shift, and go to state 29
 
-    constant  go to state 30
+    constant  转到状态 30
 
 
 State 21
@@ -461,8 +461,8 @@ State 21
     TOK_IDENT   shift, and go to state 9
     ')'         shift, and go to state 31
 
-    basetype   go to state 12
-    identdecl  go to state 32
+    basetype   转到状态 12
+    identdecl  转到状态 32
 
 
 State 22
@@ -486,8 +486,8 @@ State 23
     TOK_IDENT   shift, and go to state 9
     '}'         shift, and go to state 35
 
-    fielddecl  go to state 36
-    basetype   go to state 37
+    fielddecl  转到状态 36
+    basetype   转到状态 37
 
 
 State 24
@@ -501,8 +501,8 @@ State 24
     TOK_IDENT   shift, and go to state 9
     '}'         shift, and go to state 38
 
-    fielddecl  go to state 39
-    basetype   go to state 37
+    fielddecl  转到状态 39
+    basetype   转到状态 37
 
 
 State 25
@@ -555,9 +555,9 @@ State 31
     ';'  shift, and go to state 41
     '{'  shift, and go to state 42
 
-    fnbody   go to state 43
-    fnbodya  go to state 44
-    fnbodyb  go to state 45
+    fnbody   转到状态 43
+    fnbodya  转到状态 44
+    fnbodyb  转到状态 45
 
 
 State 32
@@ -575,9 +575,9 @@ State 33
     ';'  shift, and go to state 46
     '{'  shift, and go to state 42
 
-    fnbody   go to state 47
-    fnbodya  go to state 44
-    fnbodyb  go to state 45
+    fnbody   转到状态 47
+    fnbodya  转到状态 44
+    fnbodyb  转到状态 45
 
 
 State 34
@@ -589,8 +589,8 @@ State 34
     TOK_STRING  shift, and go to state 7
     TOK_IDENT   shift, and go to state 9
 
-    basetype   go to state 12
-    identdecl  go to state 48
+    basetype   转到状态 12
+    identdecl  转到状态 48
 
 
 State 35
@@ -670,21 +670,21 @@ State 42
     '{'            shift, and go to state 63
     '('            shift, and go to state 64
 
-    basetype    go to state 12
-    identdecl   go to state 65
-    localdecl   go to state 66
-    block       go to state 67
-    blockhaf    go to state 68
-    statement   go to state 69
-    while       go to state 70
-    ifelse      go to state 71
-    return      go to state 72
-    expr        go to state 73
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    basetype    转到状态 12
+    identdecl   转到状态 65
+    localdecl   转到状态 66
+    block       转到状态 67
+    blockhaf    转到状态 68
+    statement   转到状态 69
+    while       转到状态 70
+    ifelse      转到状态 71
+    return      转到状态 72
+    expr        转到状态 73
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 43
@@ -720,21 +720,21 @@ State 44
     '{'            shift, and go to state 63
     '('            shift, and go to state 64
 
-    basetype    go to state 12
-    identdecl   go to state 65
-    localdecl   go to state 80
-    block       go to state 67
-    blockhaf    go to state 68
-    statement   go to state 81
-    while       go to state 70
-    ifelse      go to state 71
-    return      go to state 72
-    expr        go to state 73
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    basetype    转到状态 12
+    identdecl   转到状态 65
+    localdecl   转到状态 80
+    block       转到状态 67
+    blockhaf    转到状态 68
+    statement   转到状态 81
+    while       转到状态 70
+    ifelse      转到状态 71
+    return      转到状态 72
+    expr        转到状态 73
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 45
@@ -759,18 +759,18 @@ State 45
     '{'            shift, and go to state 63
     '('            shift, and go to state 64
 
-    block       go to state 67
-    blockhaf    go to state 68
-    statement   go to state 84
-    while       go to state 70
-    ifelse      go to state 71
-    return      go to state 72
-    expr        go to state 73
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    block       转到状态 67
+    blockhaf    转到状态 68
+    statement   转到状态 84
+    while       转到状态 70
+    ifelse      转到状态 71
+    return      转到状态 72
+    expr        转到状态 73
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 46
@@ -854,12 +854,12 @@ State 55
     ';'            shift, and go to state 88
     '('            shift, and go to state 64
 
-    expr        go to state 89
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 89
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 56
@@ -873,7 +873,7 @@ State 56
     TOK_STRING  shift, and go to state 90
     TOK_IDENT   shift, and go to state 91
 
-    basetype  go to state 92
+    basetype  转到状态 92
 
 
 State 57
@@ -891,12 +891,12 @@ State 57
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 93
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 93
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 58
@@ -928,12 +928,12 @@ State 59
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 95
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 95
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 60
@@ -951,12 +951,12 @@ State 60
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 96
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 96
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 61
@@ -995,18 +995,18 @@ State 63
     '{'            shift, and go to state 63
     '('            shift, and go to state 64
 
-    block       go to state 67
-    blockhaf    go to state 68
-    statement   go to state 98
-    while       go to state 70
-    ifelse      go to state 71
-    return      go to state 72
-    expr        go to state 73
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    block       转到状态 67
+    blockhaf    转到状态 68
+    statement   转到状态 98
+    while       转到状态 70
+    ifelse      转到状态 71
+    return      转到状态 72
+    expr        转到状态 73
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 64
@@ -1024,12 +1024,12 @@ State 64
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 99
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 99
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 65
@@ -1075,18 +1075,18 @@ State 68
     '{'            shift, and go to state 63
     '('            shift, and go to state 64
 
-    block       go to state 67
-    blockhaf    go to state 68
-    statement   go to state 102
-    while       go to state 70
-    ifelse      go to state 71
-    return      go to state 72
-    expr        go to state 73
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    block       转到状态 67
+    blockhaf    转到状态 68
+    statement   转到状态 102
+    while       转到状态 70
+    ifelse      转到状态 71
+    return      转到状态 72
+    expr        转到状态 73
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 69
@@ -1258,12 +1258,12 @@ State 86
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 120
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 120
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 87
@@ -1281,12 +1281,12 @@ State 87
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 121
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 121
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 88
@@ -1399,12 +1399,12 @@ State 94
     '('            shift, and go to state 64
     ')'            shift, and go to state 125
 
-    expr        go to state 126
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 126
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 95
@@ -1519,12 +1519,12 @@ State 100
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 128
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 128
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 101
@@ -1563,12 +1563,12 @@ State 104
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 130
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 130
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 105
@@ -1586,12 +1586,12 @@ State 105
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 131
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 131
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 106
@@ -1609,12 +1609,12 @@ State 106
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 132
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 132
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 107
@@ -1632,12 +1632,12 @@ State 107
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 133
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 133
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 108
@@ -1655,12 +1655,12 @@ State 108
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 134
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 134
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 109
@@ -1678,12 +1678,12 @@ State 109
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 135
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 135
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 110
@@ -1701,12 +1701,12 @@ State 110
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 136
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 136
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 111
@@ -1724,12 +1724,12 @@ State 111
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 137
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 137
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 112
@@ -1747,12 +1747,12 @@ State 112
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 138
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 138
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 113
@@ -1770,12 +1770,12 @@ State 113
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 139
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 139
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 114
@@ -1793,12 +1793,12 @@ State 114
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 140
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 140
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 115
@@ -1816,12 +1816,12 @@ State 115
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 141
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 141
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 116
@@ -1839,12 +1839,12 @@ State 116
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 142
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 142
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 117
@@ -1876,12 +1876,12 @@ State 119
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 143
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 143
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 120
@@ -1977,12 +1977,12 @@ State 123
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 146
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 146
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 124
@@ -2000,12 +2000,12 @@ State 124
     '-'            shift, and go to state 60
     '('            shift, and go to state 64
 
-    expr        go to state 147
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    expr        转到状态 147
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 125
@@ -2528,18 +2528,18 @@ State 144
     '{'            shift, and go to state 63
     '('            shift, and go to state 64
 
-    block       go to state 67
-    blockhaf    go to state 68
-    statement   go to state 150
-    while       go to state 70
-    ifelse      go to state 71
-    return      go to state 72
-    expr        go to state 73
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    block       转到状态 67
+    blockhaf    转到状态 68
+    statement   转到状态 150
+    while       转到状态 70
+    ifelse      转到状态 71
+    return      转到状态 72
+    expr        转到状态 73
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 145
@@ -2562,18 +2562,18 @@ State 145
     '{'            shift, and go to state 63
     '('            shift, and go to state 64
 
-    block       go to state 67
-    blockhaf    go to state 68
-    statement   go to state 151
-    while       go to state 70
-    ifelse      go to state 71
-    return      go to state 72
-    expr        go to state 73
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    block       转到状态 67
+    blockhaf    转到状态 68
+    statement   转到状态 151
+    while       转到状态 70
+    ifelse      转到状态 71
+    return      转到状态 72
+    expr        转到状态 73
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 146
@@ -2711,18 +2711,18 @@ State 154
     '{'            shift, and go to state 63
     '('            shift, and go to state 64
 
-    block       go to state 67
-    blockhaf    go to state 68
-    statement   go to state 155
-    while       go to state 70
-    ifelse      go to state 71
-    return      go to state 72
-    expr        go to state 73
-    allocation  go to state 74
-    call        go to state 75
-    callhaf     go to state 76
-    variable    go to state 77
-    constant    go to state 78
+    block       转到状态 67
+    blockhaf    转到状态 68
+    statement   转到状态 155
+    while       转到状态 70
+    ifelse      转到状态 71
+    return      转到状态 72
+    expr        转到状态 73
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
 
 
 State 155

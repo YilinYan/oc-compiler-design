@@ -53,38 +53,39 @@ const string attr_to_string (size_t attri);
 
 types type_name_hash(const char* s) {
     static const unordered_map<string, types> hash {
-        {"'+'",    types::BINOP},
+            {"'+'",    types::BINOP},
             {"'-'",    types::BINOP},
             {"'*'",    types::BINOP},
             {"'/'",    types::BINOP},
             {"'%'",    types::BINOP},
-            {"POS",  types::UNOP},
-            {"NEG",  types::UNOP},
-            {"NOT",  types::UNOP},
-            {"EQ",   types::COMPARE},
-            {"NQ",   types::COMPARE},
+            {"POS",    types::UNOP},
+            {"NEG",    types::UNOP},
+            {"NOT",    types::UNOP},
+            {"EQ",     types::COMPARE},
+            {"NE",     types::COMPARE},
             {"'<'",    types::COMPARE},
             {"'>'",    types::COMPARE},
-            {"LE",   types::COMPARE},
-            {"GE",   types::COMPARE},
-            {"'='",       types::ASSIGN},
-            {"VARDECL", types::VARDECL},
+            {"LE",     types::COMPARE},
+            {"GE",     types::COMPARE},
+            {"'='",    types::ASSIGN},
+            {"VARDECL",types::VARDECL},
             {"RETURN", types::RETURN},
-            {"NEW", types::NEW},
+            {"NEW",    types::NEW},
             {"NEWSTR", types::NEWSTR},
             {"NEWARRAY", types::NEWARRAY},
-            {"IDENT", types::IDENT},
+            {"IDENT",  types::IDENT},
             {"DECLID", types::IDENT},
             {"TYPEID", types::TYPEID},
-            {"CALL", types::CALL},
-            {"INDEX", types::INDEX},
-            {"ARROW", types::FILED},
-            {"CHARCON", types::INTCON},
+            {"CALL",   types::CALL},
+            {"INDEX",  types::INDEX},
+            {"ARROW",  types::ARROW},
+            {"FIELD",  types::FIELD},
+            {"CHARCON",types::INTCON},
             {"STRINGCON", types::STRCON},
             {"INTCON", types::INTCON},
-            {"NULL", types::NULLCON},
+            {"NULL",   types::NULLCON},
             {"STRING", types::STRING},
-            {"INT", types::INT},
+            {"INT",    types::INT},
     };
     auto iter = hash.find(string(s));
 
@@ -145,10 +146,8 @@ void symbol_generator::type_check(astree* root) {
     if (strstr (tname, "TOK_") == tname) tname += 4;
     types type = type_name_hash(tname);
 
-    if(strcmp(tname, "ARROW") && root->children.size()) {
-        for(auto child : root->children)
-            type_check(child);
-    }
+    for(auto child : root->children)
+        type_check(child);
 
     root->block_nr = block_nr;
     astree* a = nullptr;
@@ -158,7 +157,7 @@ void symbol_generator::type_check(astree* root) {
     if(root->children.size() > 1)
         b = root->children[1];
 
-    DEBUGF('S', "type check: %s -> %s\n",
+    DEBUGF('S', "type check: %s ---- %s\n\n",
             root->lexinfo->c_str(), tname);
 
     size_t shr{};
@@ -188,23 +187,24 @@ void symbol_generator::type_check(astree* root) {
             break;
         case types::RETURN:
             {
-                if((root->children.size() == 0 && 
-                            type_test(func_node->attributes, 
-                                attr::VOID)) || 
-                        is_compatible(func_node->attributes, 
-                            root->children[0]->attributes)
-                  ) break;
-                astree* l = root->children[0];
-                symbol_node* r = func_node;
+                if(!func_node) {
+                    errllocprintf(root->lloc, 
+                        "%s", "return: NOT in a function\n\n");
+                    break;
+                }
+                if(root->children.size() == 0 && 
+                        type_test(func_node->attributes, 
+                            attr::VOID)) {
+                    DEBUGF('S', "return void\n\n");            
+                    break;
+                }
+                if(a && is_compatible(func_node->attributes, 
+                        a->attributes)) {
+                    DEBUGF('S', "return compatible\n\n");
+                    break;
+                }
                 errllocprintf(root->lloc, 
-                        "incompatible return type \n\t%s\n", (
-                            attrs_to_string(l->attributes, 
-                                l->symbol_item ? 
-                                l->symbol_item->type_name : "") 
-                            + "\n\t"
-                            + attrs_to_string(r->attributes, 
-                                r->type_name)).c_str());
-
+                        "%s", "incompatible return types\n");
                 break;
             }
         case types::ASSIGN:
@@ -230,7 +230,11 @@ void symbol_generator::type_check(astree* root) {
             break;
         case types::CALL: 
             {
-                if(a->symbol_item == nullptr) break; 
+                if(!a || a->symbol_item == nullptr) {
+                    errllocprintf(root->lloc, "%s",
+                            "call INVALID function\n");
+                    break; 
+                }
                 vector<symbol_node*>* params = 
                     a->symbol_item->parameters;
                 if(params->size() == root->children.size() - 1) {
@@ -246,6 +250,11 @@ void symbol_generator::type_check(astree* root) {
                         else {
                             astree* l = *i;
                             symbol_node* r = *j;
+                            
+                            //__fUNC__
+                            if(!strcmp("__FUNC__", get_decl_name(l)))
+                                    return;
+                            
                             errllocprintf(root->lloc, 
                                     "incompatible parameter \n\t%s\n",
                                     (
@@ -256,7 +265,7 @@ void symbol_generator::type_check(astree* root) {
                                         + attrs_to_string(
                                             r->attributes, 
                                             r->type_name)).c_str());
-                            break;
+                            return;
                         }
                     }
                     type_set(root, a->symbol_item->attributes);
@@ -310,17 +319,23 @@ void symbol_generator::type_check(astree* root) {
                 }
                 break;
             }
-        case types::FILED:
+        case types::ARROW:
             {
-                type_check(a);
+                if(!a || !b) break;
                 if(a->symbol_item == nullptr) break;
                 if(a->symbol_item->fields == nullptr) break;
 
+                DEBUGF('S', "type check: %s -> %s\n\n",
+                        get_decl_name(a), get_decl_name(b));
+
                 auto i = a->symbol_item->fields->find(*(b->lexinfo)); 
                 if(i != a->symbol_item->fields->end()) {
+                    DEBUGF('S', "field found: %s -> %s\n\n",
+                            get_decl_name(a), get_decl_name(b));
                     type_set(root, attr::VADDR);
                     type_set(root, attr::LVAL);
                     type_set(root, i->second->attributes);
+                    root->symbol_item = i->second;
                     break;
                 }
                 const astree* l = a;
@@ -354,7 +369,11 @@ void symbol_generator::type_check(astree* root) {
         case types::INT:
             type_set(root, attr::INT);
             break;
+        case types::FIELD:
+            break;
         default:
+//            errllocprintf(root->lloc, "type check: default: %s\n",
+//                    root->lexinfo->c_str());
             break;
     }
 
@@ -397,6 +416,11 @@ symbol_node* symbol_generator::lookup_var(astree* root) {
         root->attributes = type->second->attributes;
         return type->second;
     }
+
+    //__FUNC__
+    if(!strcmp("__FUNC__", get_decl_name(root)))
+        return nullptr;
+
     errllocprintf(root->lloc, 
             "undefined variable: %s\n",
             root->lexinfo->c_str());
@@ -682,6 +706,9 @@ void symbol_generator::_generate(astree* root) {
         symbol_table_dump(local, outfile);
         //switch back to global table
         local = global;
+    
+        //out of a func
+        func_node = nullptr;
     }
 
     else if(!strcmp(tname, "PROTO")) {
@@ -728,13 +755,11 @@ void symbol_generator::_generate(astree* root) {
         node->type_name = get_decl_name(a_name);
         node->sequence = SOME_NUM;
         //insert into struct table
-        DEBUGF('S', "struct insert\n");
         int rt = table_insert(string(get_decl_name(a_name)),
                     node, structure);
         if(rt == -1) return;
 
         //bind to astree node
-        DEBUGF('S', "struct bind ast\n");
         a_name->symbol_item = node;
         a_name->attributes = node->attributes;
 
@@ -749,7 +774,6 @@ void symbol_generator::_generate(astree* root) {
             }
         }
         //dump
-        DEBUGF('S', "struct dump\n");
         node->dump(node->type_name, outfile);
         symbol_table_dump(table, outfile); 
     }
