@@ -1,0 +1,6 @@
+struct A {}
+struct B{
+    string a;
+    void[] b;
+    xxx[]  c;
+}

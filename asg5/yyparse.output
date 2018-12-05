@@ -1,0 +1,2732 @@
+Terminals unused in grammar
+
+   TOK_CHAR
+   TOK_LT
+   TOK_GT
+   TOK_ROOT
+   TOK_BLOCK
+   TOK_CALL
+   TOK_IFELSE
+   TOK_INITDECL
+   TOK_NEWARRAY
+   TOK_TYPEID
+   TOK_FIELD
+   TOK_FUNCTION
+   TOK_PARAM
+   TOK_PROTO
+   TOK_DECLID
+   TOK_NEWSTR
+   TOK_INDEX
+   TOK_VARDECL
+
+
+状态 91conflicts: 1 reduce/reduce
+
+
+语法
+
+    0 $accept: start $end
+
+    1 start: program
+
+    2 program: program structdef
+    3        | program function
+    4        | program globaldecl
+    5        | program error '}'
+    6        | program error ';'
+    7        | %empty
+
+    8 globaldecl: identdecl '=' constant ';'
+
+    9 structdef: TOK_STRUCT TOK_IDENT '{' '}'
+   10          | TOK_STRUCT TOK_IDENT structhaf '}'
+
+   11 structhaf: '{' fielddecl ';'
+   12          | structhaf fielddecl ';'
+
+   13 fielddecl: basetype TOK_IDENT
+   14          | basetype TOK_ARRAY TOK_IDENT
+
+   15 basetype: TOK_VOID
+   16         | TOK_INT
+   17         | TOK_STRING
+   18         | TOK_IDENT
+
+   19 function: identdecl '(' ')' fnbody
+   20         | identdecl param ')' fnbody
+   21         | identdecl '(' ')' ';'
+   22         | identdecl param ')' ';'
+
+   23 param: param ',' identdecl
+   24      | '(' identdecl
+
+   25 identdecl: basetype TOK_IDENT
+   26          | basetype TOK_ARRAY TOK_IDENT
+
+   27 fnbody: '{' '}'
+   28       | fnbodyb '}'
+   29       | fnbodya '}'
+
+   30 fnbodya: '{' localdecl
+   31        | fnbodya localdecl
+
+   32 fnbodyb: '{' statement
+   33        | fnbodyb statement
+   34        | fnbodya statement
+
+   35 localdecl: identdecl '=' expr ';'
+
+   36 block: '{' '}'
+   37      | blockhaf '}'
+
+   38 blockhaf: blockhaf statement
+   39         | '{' statement
+
+   40 statement: block
+   41          | while
+   42          | ifelse
+   43          | return
+   44          | expr ';'
+   45          | ';'
+
+   46 while: TOK_WHILE '(' expr ')' statement
+
+   47 ifelse: TOK_IF '(' expr ')' statement
+   48       | TOK_IF '(' expr ')' statement TOK_ELSE statement
+
+   49 return: TOK_RETURN expr ';'
+   50       | TOK_RETURN ';'
+
+   51 expr: expr '=' expr
+   52     | expr TOK_EQ expr
+   53     | expr TOK_NE expr
+   54     | expr TOK_LE expr
+   55     | expr TOK_GE expr
+   56     | expr '<' expr
+   57     | expr '>' expr
+   58     | expr '+' expr
+   59     | expr '-' expr
+   60     | expr '*' expr
+   61     | expr '/' expr
+   62     | expr '%' expr
+   63     | '+' expr
+   64     | '-' expr
+   65     | TOK_NOT expr
+   66     | call
+   67     | '(' expr ')'
+   68     | variable
+   69     | constant
+   70     | allocation
+
+   71 allocation: TOK_NEW TOK_IDENT
+   72           | TOK_NEW TOK_STRING '(' expr ')'
+   73           | TOK_NEW basetype '[' expr ']'
+
+   74 call: TOK_IDENT '(' ')'
+   75     | callhaf ')'
+
+   76 callhaf: callhaf ',' expr
+   77        | TOK_IDENT '(' expr
+
+   78 variable: TOK_IDENT
+   79         | expr '[' expr ']'
+   80         | expr TOK_ARROW TOK_IDENT
+
+   81 constant: TOK_INTCON
+   82         | TOK_CHARCON
+   83         | TOK_STRINGCON
+   84         | TOK_NULL
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'%' (37) 62
+'(' (40) 19 21 24 46 47 48 67 72 74 77
+')' (41) 19 20 21 22 46 47 48 67 72 74 75
+'*' (42) 60
+'+' (43) 58 63
+',' (44) 23 76
+'-' (45) 59 64
+'/' (47) 61
+';' (59) 6 8 11 12 21 22 35 44 45 49 50
+'<' (60) 56
+'=' (61) 8 35 51
+'>' (62) 57
+'[' (91) 73 79
+']' (93) 73 79
+'{' (123) 9 11 27 30 32 36 39
+'}' (125) 5 9 10 27 28 29 36 37
+error (256) 5 6
+TOK_VOID (258) 15
+TOK_CHAR (259)
+TOK_INT (260) 16
+TOK_STRING (261) 17 72
+TOK_IF (262) 47 48
+TOK_ELSE (263) 48
+TOK_WHILE (264) 46
+TOK_RETURN (265) 49 50
+TOK_STRUCT (266) 9 10
+TOK_NULL (267) 84
+TOK_NEW (268) 71 72 73
+TOK_ARRAY (269) 14 26
+TOK_ARROW (270) 80
+TOK_EQ (271) 52
+TOK_NE (272) 53
+TOK_LT (273)
+TOK_LE (274) 54
+TOK_GT (275)
+TOK_GE (276) 55
+TOK_NOT (277) 65
+TOK_IDENT (278) 9 10 13 14 18 25 26 71 74 77 78 80
+TOK_INTCON (279) 81
+TOK_CHARCON (280) 82
+TOK_STRINGCON (281) 83
+TOK_ROOT (282)
+TOK_BLOCK (283)
+TOK_CALL (284)
+TOK_IFELSE (285)
+TOK_INITDECL (286)
+TOK_POS (287)
+TOK_NEG (288)
+TOK_NEWARRAY (289)
+TOK_TYPEID (290)
+TOK_FIELD (291)
+TOK_FUNCTION (292)
+TOK_PARAM (293)
+TOK_PROTO (294)
+TOK_DECLID (295)
+TOK_NEWSTR (296)
+TOK_INDEX (297)
+TOK_VARDECL (298)
+
+
+Nonterminals, with rules where they appear
+
+$accept (60)
+    on left: 0
+start (61)
+    on left: 1, on right: 0
+program (62)
+    on left: 2 3 4 5 6 7, on right: 1 2 3 4 5 6
+globaldecl (63)
+    on left: 8, on right: 4
+structdef (64)
+    on left: 9 10, on right: 2
+structhaf (65)
+    on left: 11 12, on right: 10 12
+fielddecl (66)
+    on left: 13 14, on right: 11 12
+basetype (67)
+    on left: 15 16 17 18, on right: 13 14 25 26 73
+function (68)
+    on left: 19 20 21 22, on right: 3
+param (69)
+    on left: 23 24, on right: 20 22 23
+identdecl (70)
+    on left: 25 26, on right: 8 19 20 21 22 23 24 35
+fnbody (71)
+    on left: 27 28 29, on right: 19 20
+fnbodya (72)
+    on left: 30 31, on right: 29 31 34
+fnbodyb (73)
+    on left: 32 33 34, on right: 28 33
+localdecl (74)
+    on left: 35, on right: 30 31
+block (75)
+    on left: 36 37, on right: 40
+blockhaf (76)
+    on left: 38 39, on right: 37 38
+statement (77)
+    on left: 40 41 42 43 44 45, on right: 32 33 34 38 39 46 47 48
+while (78)
+    on left: 46, on right: 41
+ifelse (79)
+    on left: 47 48, on right: 42
+return (80)
+    on left: 49 50, on right: 43
+expr (81)
+    on left: 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68
+    69 70, on right: 35 44 46 47 48 49 51 52 53 54 55 56 57 58 59 60
+    61 62 63 64 65 67 72 73 76 77 79 80
+allocation (82)
+    on left: 71 72 73, on right: 70
+call (83)
+    on left: 74 75, on right: 66
+callhaf (84)
+    on left: 76 77, on right: 75 76
+variable (85)
+    on left: 78 79 80, on right: 68
+constant (86)
+    on left: 81 82 83 84, on right: 8 69
+
+
+State 0
+
+    0 $accept: . start $end
+
+    $default  reduce using rule 7 (program)
+
+    start    转到状态 1
+    program  转到状态 2
+
+
+State 1
+
+    0 $accept: start . $end
+
+    $end  shift, and go to state 3
+
+
+State 2
+
+    1 start: program .
+    2 program: program . structdef
+    3        | program . function
+    4        | program . globaldecl
+    5        | program . error '}'
+    6        | program . error ';'
+
+    error       shift, and go to state 4
+    TOK_VOID    shift, and go to state 5
+    TOK_INT     shift, and go to state 6
+    TOK_STRING  shift, and go to state 7
+    TOK_STRUCT  shift, and go to state 8
+    TOK_IDENT   shift, and go to state 9
+
+    $end  reduce using rule 1 (start)
+
+    globaldecl  转到状态 10
+    structdef   转到状态 11
+    basetype    转到状态 12
+    function    转到状态 13
+    identdecl   转到状态 14
+
+
+State 3
+
+    0 $accept: start $end .
+
+    $default  接受
+
+
+State 4
+
+    5 program: program error . '}'
+    6        | program error . ';'
+
+    '}'  shift, and go to state 15
+    ';'  shift, and go to state 16
+
+
+State 5
+
+   15 basetype: TOK_VOID .
+
+    $default  reduce using rule 15 (basetype)
+
+
+State 6
+
+   16 basetype: TOK_INT .
+
+    $default  reduce using rule 16 (basetype)
+
+
+State 7
+
+   17 basetype: TOK_STRING .
+
+    $default  reduce using rule 17 (basetype)
+
+
+State 8
+
+    9 structdef: TOK_STRUCT . TOK_IDENT '{' '}'
+   10          | TOK_STRUCT . TOK_IDENT structhaf '}'
+
+    TOK_IDENT  shift, and go to state 17
+
+
+State 9
+
+   18 basetype: TOK_IDENT .
+
+    $default  reduce using rule 18 (basetype)
+
+
+State 10
+
+    4 program: program globaldecl .
+
+    $default  reduce using rule 4 (program)
+
+
+State 11
+
+    2 program: program structdef .
+
+    $default  reduce using rule 2 (program)
+
+
+State 12
+
+   25 identdecl: basetype . TOK_IDENT
+   26          | basetype . TOK_ARRAY TOK_IDENT
+
+    TOK_ARRAY  shift, and go to state 18
+    TOK_IDENT  shift, and go to state 19
+
+
+State 13
+
+    3 program: program function .
+
+    $default  reduce using rule 3 (program)
+
+
+State 14
+
+    8 globaldecl: identdecl . '=' constant ';'
+   19 function: identdecl . '(' ')' fnbody
+   20         | identdecl . param ')' fnbody
+   21         | identdecl . '(' ')' ';'
+   22         | identdecl . param ')' ';'
+
+    '='  shift, and go to state 20
+    '('  shift, and go to state 21
+
+    param  转到状态 22
+
+
+State 15
+
+    5 program: program error '}' .
+
+    $default  reduce using rule 5 (program)
+
+
+State 16
+
+    6 program: program error ';' .
+
+    $default  reduce using rule 6 (program)
+
+
+State 17
+
+    9 structdef: TOK_STRUCT TOK_IDENT . '{' '}'
+   10          | TOK_STRUCT TOK_IDENT . structhaf '}'
+
+    '{'  shift, and go to state 23
+
+    structhaf  转到状态 24
+
+
+State 18
+
+   26 identdecl: basetype TOK_ARRAY . TOK_IDENT
+
+    TOK_IDENT  shift, and go to state 25
+
+
+State 19
+
+   25 identdecl: basetype TOK_IDENT .
+
+    $default  reduce using rule 25 (identdecl)
+
+
+State 20
+
+    8 globaldecl: identdecl '=' . constant ';'
+
+    TOK_NULL       shift, and go to state 26
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+
+    constant  转到状态 30
+
+
+State 21
+
+   19 function: identdecl '(' . ')' fnbody
+   21         | identdecl '(' . ')' ';'
+   24 param: '(' . identdecl
+
+    TOK_VOID    shift, and go to state 5
+    TOK_INT     shift, and go to state 6
+    TOK_STRING  shift, and go to state 7
+    TOK_IDENT   shift, and go to state 9
+    ')'         shift, and go to state 31
+
+    basetype   转到状态 12
+    identdecl  转到状态 32
+
+
+State 22
+
+   20 function: identdecl param . ')' fnbody
+   22         | identdecl param . ')' ';'
+   23 param: param . ',' identdecl
+
+    ')'  shift, and go to state 33
+    ','  shift, and go to state 34
+
+
+State 23
+
+    9 structdef: TOK_STRUCT TOK_IDENT '{' . '}'
+   11 structhaf: '{' . fielddecl ';'
+
+    TOK_VOID    shift, and go to state 5
+    TOK_INT     shift, and go to state 6
+    TOK_STRING  shift, and go to state 7
+    TOK_IDENT   shift, and go to state 9
+    '}'         shift, and go to state 35
+
+    fielddecl  转到状态 36
+    basetype   转到状态 37
+
+
+State 24
+
+   10 structdef: TOK_STRUCT TOK_IDENT structhaf . '}'
+   12 structhaf: structhaf . fielddecl ';'
+
+    TOK_VOID    shift, and go to state 5
+    TOK_INT     shift, and go to state 6
+    TOK_STRING  shift, and go to state 7
+    TOK_IDENT   shift, and go to state 9
+    '}'         shift, and go to state 38
+
+    fielddecl  转到状态 39
+    basetype   转到状态 37
+
+
+State 25
+
+   26 identdecl: basetype TOK_ARRAY TOK_IDENT .
+
+    $default  reduce using rule 26 (identdecl)
+
+
+State 26
+
+   84 constant: TOK_NULL .
+
+    $default  reduce using rule 84 (constant)
+
+
+State 27
+
+   81 constant: TOK_INTCON .
+
+    $default  reduce using rule 81 (constant)
+
+
+State 28
+
+   82 constant: TOK_CHARCON .
+
+    $default  reduce using rule 82 (constant)
+
+
+State 29
+
+   83 constant: TOK_STRINGCON .
+
+    $default  reduce using rule 83 (constant)
+
+
+State 30
+
+    8 globaldecl: identdecl '=' constant . ';'
+
+    ';'  shift, and go to state 40
+
+
+State 31
+
+   19 function: identdecl '(' ')' . fnbody
+   21         | identdecl '(' ')' . ';'
+
+    ';'  shift, and go to state 41
+    '{'  shift, and go to state 42
+
+    fnbody   转到状态 43
+    fnbodya  转到状态 44
+    fnbodyb  转到状态 45
+
+
+State 32
+
+   24 param: '(' identdecl .
+
+    $default  reduce using rule 24 (param)
+
+
+State 33
+
+   20 function: identdecl param ')' . fnbody
+   22         | identdecl param ')' . ';'
+
+    ';'  shift, and go to state 46
+    '{'  shift, and go to state 42
+
+    fnbody   转到状态 47
+    fnbodya  转到状态 44
+    fnbodyb  转到状态 45
+
+
+State 34
+
+   23 param: param ',' . identdecl
+
+    TOK_VOID    shift, and go to state 5
+    TOK_INT     shift, and go to state 6
+    TOK_STRING  shift, and go to state 7
+    TOK_IDENT   shift, and go to state 9
+
+    basetype   转到状态 12
+    identdecl  转到状态 48
+
+
+State 35
+
+    9 structdef: TOK_STRUCT TOK_IDENT '{' '}' .
+
+    $default  reduce using rule 9 (structdef)
+
+
+State 36
+
+   11 structhaf: '{' fielddecl . ';'
+
+    ';'  shift, and go to state 49
+
+
+State 37
+
+   13 fielddecl: basetype . TOK_IDENT
+   14          | basetype . TOK_ARRAY TOK_IDENT
+
+    TOK_ARRAY  shift, and go to state 50
+    TOK_IDENT  shift, and go to state 51
+
+
+State 38
+
+   10 structdef: TOK_STRUCT TOK_IDENT structhaf '}' .
+
+    $default  reduce using rule 10 (structdef)
+
+
+State 39
+
+   12 structhaf: structhaf fielddecl . ';'
+
+    ';'  shift, and go to state 52
+
+
+State 40
+
+    8 globaldecl: identdecl '=' constant ';' .
+
+    $default  reduce using rule 8 (globaldecl)
+
+
+State 41
+
+   21 function: identdecl '(' ')' ';' .
+
+    $default  reduce using rule 21 (function)
+
+
+State 42
+
+   27 fnbody: '{' . '}'
+   30 fnbodya: '{' . localdecl
+   32 fnbodyb: '{' . statement
+
+    TOK_VOID       shift, and go to state 5
+    TOK_INT        shift, and go to state 6
+    TOK_STRING     shift, and go to state 7
+    TOK_IF         shift, and go to state 53
+    TOK_WHILE      shift, and go to state 54
+    TOK_RETURN     shift, and go to state 55
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 58
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '}'            shift, and go to state 61
+    ';'            shift, and go to state 62
+    '{'            shift, and go to state 63
+    '('            shift, and go to state 64
+
+    basetype    转到状态 12
+    identdecl   转到状态 65
+    localdecl   转到状态 66
+    block       转到状态 67
+    blockhaf    转到状态 68
+    statement   转到状态 69
+    while       转到状态 70
+    ifelse      转到状态 71
+    return      转到状态 72
+    expr        转到状态 73
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 43
+
+   19 function: identdecl '(' ')' fnbody .
+
+    $default  reduce using rule 19 (function)
+
+
+State 44
+
+   29 fnbody: fnbodya . '}'
+   31 fnbodya: fnbodya . localdecl
+   34 fnbodyb: fnbodya . statement
+
+    TOK_VOID       shift, and go to state 5
+    TOK_INT        shift, and go to state 6
+    TOK_STRING     shift, and go to state 7
+    TOK_IF         shift, and go to state 53
+    TOK_WHILE      shift, and go to state 54
+    TOK_RETURN     shift, and go to state 55
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 58
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '}'            shift, and go to state 79
+    ';'            shift, and go to state 62
+    '{'            shift, and go to state 63
+    '('            shift, and go to state 64
+
+    basetype    转到状态 12
+    identdecl   转到状态 65
+    localdecl   转到状态 80
+    block       转到状态 67
+    blockhaf    转到状态 68
+    statement   转到状态 81
+    while       转到状态 70
+    ifelse      转到状态 71
+    return      转到状态 72
+    expr        转到状态 73
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 45
+
+   28 fnbody: fnbodyb . '}'
+   33 fnbodyb: fnbodyb . statement
+
+    TOK_IF         shift, and go to state 53
+    TOK_WHILE      shift, and go to state 54
+    TOK_RETURN     shift, and go to state 55
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '}'            shift, and go to state 83
+    ';'            shift, and go to state 62
+    '{'            shift, and go to state 63
+    '('            shift, and go to state 64
+
+    block       转到状态 67
+    blockhaf    转到状态 68
+    statement   转到状态 84
+    while       转到状态 70
+    ifelse      转到状态 71
+    return      转到状态 72
+    expr        转到状态 73
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 46
+
+   22 function: identdecl param ')' ';' .
+
+    $default  reduce using rule 22 (function)
+
+
+State 47
+
+   20 function: identdecl param ')' fnbody .
+
+    $default  reduce using rule 20 (function)
+
+
+State 48
+
+   23 param: param ',' identdecl .
+
+    $default  reduce using rule 23 (param)
+
+
+State 49
+
+   11 structhaf: '{' fielddecl ';' .
+
+    $default  reduce using rule 11 (structhaf)
+
+
+State 50
+
+   14 fielddecl: basetype TOK_ARRAY . TOK_IDENT
+
+    TOK_IDENT  shift, and go to state 85
+
+
+State 51
+
+   13 fielddecl: basetype TOK_IDENT .
+
+    $default  reduce using rule 13 (fielddecl)
+
+
+State 52
+
+   12 structhaf: structhaf fielddecl ';' .
+
+    $default  reduce using rule 12 (structhaf)
+
+
+State 53
+
+   47 ifelse: TOK_IF . '(' expr ')' statement
+   48       | TOK_IF . '(' expr ')' statement TOK_ELSE statement
+
+    '('  shift, and go to state 86
+
+
+State 54
+
+   46 while: TOK_WHILE . '(' expr ')' statement
+
+    '('  shift, and go to state 87
+
+
+State 55
+
+   49 return: TOK_RETURN . expr ';'
+   50       | TOK_RETURN . ';'
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    ';'            shift, and go to state 88
+    '('            shift, and go to state 64
+
+    expr        转到状态 89
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 56
+
+   71 allocation: TOK_NEW . TOK_IDENT
+   72           | TOK_NEW . TOK_STRING '(' expr ')'
+   73           | TOK_NEW . basetype '[' expr ']'
+
+    TOK_VOID    shift, and go to state 5
+    TOK_INT     shift, and go to state 6
+    TOK_STRING  shift, and go to state 90
+    TOK_IDENT   shift, and go to state 91
+
+    basetype  转到状态 92
+
+
+State 57
+
+   65 expr: TOK_NOT . expr
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 93
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 58
+
+   18 basetype: TOK_IDENT .
+   74 call: TOK_IDENT . '(' ')'
+   77 callhaf: TOK_IDENT . '(' expr
+   78 variable: TOK_IDENT .
+
+    '('  shift, and go to state 94
+
+    TOK_ARRAY  reduce using rule 18 (basetype)
+    TOK_IDENT  reduce using rule 18 (basetype)
+    $default   reduce using rule 78 (variable)
+
+
+State 59
+
+   63 expr: '+' . expr
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 95
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 60
+
+   64 expr: '-' . expr
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 96
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 61
+
+   27 fnbody: '{' '}' .
+
+    $default  reduce using rule 27 (fnbody)
+
+
+State 62
+
+   45 statement: ';' .
+
+    $default  reduce using rule 45 (statement)
+
+
+State 63
+
+   36 block: '{' . '}'
+   39 blockhaf: '{' . statement
+
+    TOK_IF         shift, and go to state 53
+    TOK_WHILE      shift, and go to state 54
+    TOK_RETURN     shift, and go to state 55
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '}'            shift, and go to state 97
+    ';'            shift, and go to state 62
+    '{'            shift, and go to state 63
+    '('            shift, and go to state 64
+
+    block       转到状态 67
+    blockhaf    转到状态 68
+    statement   转到状态 98
+    while       转到状态 70
+    ifelse      转到状态 71
+    return      转到状态 72
+    expr        转到状态 73
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 64
+
+   67 expr: '(' . expr ')'
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 99
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 65
+
+   35 localdecl: identdecl . '=' expr ';'
+
+    '='  shift, and go to state 100
+
+
+State 66
+
+   30 fnbodya: '{' localdecl .
+
+    $default  reduce using rule 30 (fnbodya)
+
+
+State 67
+
+   40 statement: block .
+
+    $default  reduce using rule 40 (statement)
+
+
+State 68
+
+   37 block: blockhaf . '}'
+   38 blockhaf: blockhaf . statement
+
+    TOK_IF         shift, and go to state 53
+    TOK_WHILE      shift, and go to state 54
+    TOK_RETURN     shift, and go to state 55
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '}'            shift, and go to state 101
+    ';'            shift, and go to state 62
+    '{'            shift, and go to state 63
+    '('            shift, and go to state 64
+
+    block       转到状态 67
+    blockhaf    转到状态 68
+    statement   转到状态 102
+    while       转到状态 70
+    ifelse      转到状态 71
+    return      转到状态 72
+    expr        转到状态 73
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 69
+
+   32 fnbodyb: '{' statement .
+
+    $default  reduce using rule 32 (fnbodyb)
+
+
+State 70
+
+   41 statement: while .
+
+    $default  reduce using rule 41 (statement)
+
+
+State 71
+
+   42 statement: ifelse .
+
+    $default  reduce using rule 42 (statement)
+
+
+State 72
+
+   43 statement: return .
+
+    $default  reduce using rule 43 (statement)
+
+
+State 73
+
+   44 statement: expr . ';'
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    TOK_EQ     shift, and go to state 104
+    TOK_NE     shift, and go to state 105
+    TOK_LE     shift, and go to state 106
+    TOK_GE     shift, and go to state 107
+    '='        shift, and go to state 108
+    '<'        shift, and go to state 109
+    '>'        shift, and go to state 110
+    '+'        shift, and go to state 111
+    '-'        shift, and go to state 112
+    '*'        shift, and go to state 113
+    '/'        shift, and go to state 114
+    '%'        shift, and go to state 115
+    '['        shift, and go to state 116
+    ';'        shift, and go to state 117
+
+
+State 74
+
+   70 expr: allocation .
+
+    $default  reduce using rule 70 (expr)
+
+
+State 75
+
+   66 expr: call .
+
+    $default  reduce using rule 66 (expr)
+
+
+State 76
+
+   75 call: callhaf . ')'
+   76 callhaf: callhaf . ',' expr
+
+    ')'  shift, and go to state 118
+    ','  shift, and go to state 119
+
+
+State 77
+
+   68 expr: variable .
+
+    $default  reduce using rule 68 (expr)
+
+
+State 78
+
+   69 expr: constant .
+
+    $default  reduce using rule 69 (expr)
+
+
+State 79
+
+   29 fnbody: fnbodya '}' .
+
+    $default  reduce using rule 29 (fnbody)
+
+
+State 80
+
+   31 fnbodya: fnbodya localdecl .
+
+    $default  reduce using rule 31 (fnbodya)
+
+
+State 81
+
+   34 fnbodyb: fnbodya statement .
+
+    $default  reduce using rule 34 (fnbodyb)
+
+
+State 82
+
+   74 call: TOK_IDENT . '(' ')'
+   77 callhaf: TOK_IDENT . '(' expr
+   78 variable: TOK_IDENT .
+
+    '('  shift, and go to state 94
+
+    $default  reduce using rule 78 (variable)
+
+
+State 83
+
+   28 fnbody: fnbodyb '}' .
+
+    $default  reduce using rule 28 (fnbody)
+
+
+State 84
+
+   33 fnbodyb: fnbodyb statement .
+
+    $default  reduce using rule 33 (fnbodyb)
+
+
+State 85
+
+   14 fielddecl: basetype TOK_ARRAY TOK_IDENT .
+
+    $default  reduce using rule 14 (fielddecl)
+
+
+State 86
+
+   47 ifelse: TOK_IF '(' . expr ')' statement
+   48       | TOK_IF '(' . expr ')' statement TOK_ELSE statement
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 120
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 87
+
+   46 while: TOK_WHILE '(' . expr ')' statement
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 121
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 88
+
+   50 return: TOK_RETURN ';' .
+
+    $default  reduce using rule 50 (return)
+
+
+State 89
+
+   49 return: TOK_RETURN expr . ';'
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    TOK_EQ     shift, and go to state 104
+    TOK_NE     shift, and go to state 105
+    TOK_LE     shift, and go to state 106
+    TOK_GE     shift, and go to state 107
+    '='        shift, and go to state 108
+    '<'        shift, and go to state 109
+    '>'        shift, and go to state 110
+    '+'        shift, and go to state 111
+    '-'        shift, and go to state 112
+    '*'        shift, and go to state 113
+    '/'        shift, and go to state 114
+    '%'        shift, and go to state 115
+    '['        shift, and go to state 116
+    ';'        shift, and go to state 122
+
+
+State 90
+
+   17 basetype: TOK_STRING .
+   72 allocation: TOK_NEW TOK_STRING . '(' expr ')'
+
+    '('  shift, and go to state 123
+
+    $default  reduce using rule 17 (basetype)
+
+
+State 91
+
+   18 basetype: TOK_IDENT .
+   71 allocation: TOK_NEW TOK_IDENT .
+
+    '['       reduce using rule 18 (basetype)
+    '['       [reduce using rule 71 (allocation)]
+    $default  reduce using rule 71 (allocation)
+
+
+State 92
+
+   73 allocation: TOK_NEW basetype . '[' expr ']'
+
+    '['  shift, and go to state 124
+
+
+State 93
+
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   65     | TOK_NOT expr .
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    '['        shift, and go to state 116
+
+    $default  reduce using rule 65 (expr)
+
+
+State 94
+
+   74 call: TOK_IDENT '(' . ')'
+   77 callhaf: TOK_IDENT '(' . expr
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+    ')'            shift, and go to state 125
+
+    expr        转到状态 126
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 95
+
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   63     | '+' expr .
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    '['        shift, and go to state 116
+
+    $default  reduce using rule 63 (expr)
+
+
+State 96
+
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   64     | '-' expr .
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    '['        shift, and go to state 116
+
+    $default  reduce using rule 64 (expr)
+
+
+State 97
+
+   36 block: '{' '}' .
+
+    $default  reduce using rule 36 (block)
+
+
+State 98
+
+   39 blockhaf: '{' statement .
+
+    $default  reduce using rule 39 (blockhaf)
+
+
+State 99
+
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   67     | '(' expr . ')'
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    TOK_EQ     shift, and go to state 104
+    TOK_NE     shift, and go to state 105
+    TOK_LE     shift, and go to state 106
+    TOK_GE     shift, and go to state 107
+    '='        shift, and go to state 108
+    '<'        shift, and go to state 109
+    '>'        shift, and go to state 110
+    '+'        shift, and go to state 111
+    '-'        shift, and go to state 112
+    '*'        shift, and go to state 113
+    '/'        shift, and go to state 114
+    '%'        shift, and go to state 115
+    '['        shift, and go to state 116
+    ')'        shift, and go to state 127
+
+
+State 100
+
+   35 localdecl: identdecl '=' . expr ';'
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 128
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 101
+
+   37 block: blockhaf '}' .
+
+    $default  reduce using rule 37 (block)
+
+
+State 102
+
+   38 blockhaf: blockhaf statement .
+
+    $default  reduce using rule 38 (blockhaf)
+
+
+State 103
+
+   80 variable: expr TOK_ARROW . TOK_IDENT
+
+    TOK_IDENT  shift, and go to state 129
+
+
+State 104
+
+   52 expr: expr TOK_EQ . expr
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 130
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 105
+
+   53 expr: expr TOK_NE . expr
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 131
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 106
+
+   54 expr: expr TOK_LE . expr
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 132
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 107
+
+   55 expr: expr TOK_GE . expr
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 133
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 108
+
+   51 expr: expr '=' . expr
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 134
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 109
+
+   56 expr: expr '<' . expr
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 135
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 110
+
+   57 expr: expr '>' . expr
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 136
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 111
+
+   58 expr: expr '+' . expr
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 137
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 112
+
+   59 expr: expr '-' . expr
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 138
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 113
+
+   60 expr: expr '*' . expr
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 139
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 114
+
+   61 expr: expr '/' . expr
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 140
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 115
+
+   62 expr: expr '%' . expr
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 141
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 116
+
+   79 variable: expr '[' . expr ']'
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 142
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 117
+
+   44 statement: expr ';' .
+
+    $default  reduce using rule 44 (statement)
+
+
+State 118
+
+   75 call: callhaf ')' .
+
+    $default  reduce using rule 75 (call)
+
+
+State 119
+
+   76 callhaf: callhaf ',' . expr
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 143
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 120
+
+   47 ifelse: TOK_IF '(' expr . ')' statement
+   48       | TOK_IF '(' expr . ')' statement TOK_ELSE statement
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    TOK_EQ     shift, and go to state 104
+    TOK_NE     shift, and go to state 105
+    TOK_LE     shift, and go to state 106
+    TOK_GE     shift, and go to state 107
+    '='        shift, and go to state 108
+    '<'        shift, and go to state 109
+    '>'        shift, and go to state 110
+    '+'        shift, and go to state 111
+    '-'        shift, and go to state 112
+    '*'        shift, and go to state 113
+    '/'        shift, and go to state 114
+    '%'        shift, and go to state 115
+    '['        shift, and go to state 116
+    ')'        shift, and go to state 144
+
+
+State 121
+
+   46 while: TOK_WHILE '(' expr . ')' statement
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    TOK_EQ     shift, and go to state 104
+    TOK_NE     shift, and go to state 105
+    TOK_LE     shift, and go to state 106
+    TOK_GE     shift, and go to state 107
+    '='        shift, and go to state 108
+    '<'        shift, and go to state 109
+    '>'        shift, and go to state 110
+    '+'        shift, and go to state 111
+    '-'        shift, and go to state 112
+    '*'        shift, and go to state 113
+    '/'        shift, and go to state 114
+    '%'        shift, and go to state 115
+    '['        shift, and go to state 116
+    ')'        shift, and go to state 145
+
+
+State 122
+
+   49 return: TOK_RETURN expr ';' .
+
+    $default  reduce using rule 49 (return)
+
+
+State 123
+
+   72 allocation: TOK_NEW TOK_STRING '(' . expr ')'
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 146
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 124
+
+   73 allocation: TOK_NEW basetype '[' . expr ']'
+
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    '('            shift, and go to state 64
+
+    expr        转到状态 147
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 125
+
+   74 call: TOK_IDENT '(' ')' .
+
+    $default  reduce using rule 74 (call)
+
+
+State 126
+
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   77 callhaf: TOK_IDENT '(' expr .
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    TOK_EQ     shift, and go to state 104
+    TOK_NE     shift, and go to state 105
+    TOK_LE     shift, and go to state 106
+    TOK_GE     shift, and go to state 107
+    '='        shift, and go to state 108
+    '<'        shift, and go to state 109
+    '>'        shift, and go to state 110
+    '+'        shift, and go to state 111
+    '-'        shift, and go to state 112
+    '*'        shift, and go to state 113
+    '/'        shift, and go to state 114
+    '%'        shift, and go to state 115
+    '['        shift, and go to state 116
+
+    $default  reduce using rule 77 (callhaf)
+
+
+State 127
+
+   67 expr: '(' expr ')' .
+
+    $default  reduce using rule 67 (expr)
+
+
+State 128
+
+   35 localdecl: identdecl '=' expr . ';'
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    TOK_EQ     shift, and go to state 104
+    TOK_NE     shift, and go to state 105
+    TOK_LE     shift, and go to state 106
+    TOK_GE     shift, and go to state 107
+    '='        shift, and go to state 108
+    '<'        shift, and go to state 109
+    '>'        shift, and go to state 110
+    '+'        shift, and go to state 111
+    '-'        shift, and go to state 112
+    '*'        shift, and go to state 113
+    '/'        shift, and go to state 114
+    '%'        shift, and go to state 115
+    '['        shift, and go to state 116
+    ';'        shift, and go to state 148
+
+
+State 129
+
+   80 variable: expr TOK_ARROW TOK_IDENT .
+
+    $default  reduce using rule 80 (variable)
+
+
+State 130
+
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   52     | expr TOK_EQ expr .
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    '+'        shift, and go to state 111
+    '-'        shift, and go to state 112
+    '*'        shift, and go to state 113
+    '/'        shift, and go to state 114
+    '%'        shift, and go to state 115
+    '['        shift, and go to state 116
+
+    $default  reduce using rule 52 (expr)
+
+
+State 131
+
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   53     | expr TOK_NE expr .
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    '+'        shift, and go to state 111
+    '-'        shift, and go to state 112
+    '*'        shift, and go to state 113
+    '/'        shift, and go to state 114
+    '%'        shift, and go to state 115
+    '['        shift, and go to state 116
+
+    $default  reduce using rule 53 (expr)
+
+
+State 132
+
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   54     | expr TOK_LE expr .
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    '+'        shift, and go to state 111
+    '-'        shift, and go to state 112
+    '*'        shift, and go to state 113
+    '/'        shift, and go to state 114
+    '%'        shift, and go to state 115
+    '['        shift, and go to state 116
+
+    $default  reduce using rule 54 (expr)
+
+
+State 133
+
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   55     | expr TOK_GE expr .
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    '+'        shift, and go to state 111
+    '-'        shift, and go to state 112
+    '*'        shift, and go to state 113
+    '/'        shift, and go to state 114
+    '%'        shift, and go to state 115
+    '['        shift, and go to state 116
+
+    $default  reduce using rule 55 (expr)
+
+
+State 134
+
+   51 expr: expr . '=' expr
+   51     | expr '=' expr .
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    TOK_EQ     shift, and go to state 104
+    TOK_NE     shift, and go to state 105
+    TOK_LE     shift, and go to state 106
+    TOK_GE     shift, and go to state 107
+    '='        shift, and go to state 108
+    '<'        shift, and go to state 109
+    '>'        shift, and go to state 110
+    '+'        shift, and go to state 111
+    '-'        shift, and go to state 112
+    '*'        shift, and go to state 113
+    '/'        shift, and go to state 114
+    '%'        shift, and go to state 115
+    '['        shift, and go to state 116
+
+    $default  reduce using rule 51 (expr)
+
+
+State 135
+
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   56     | expr '<' expr .
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    '+'        shift, and go to state 111
+    '-'        shift, and go to state 112
+    '*'        shift, and go to state 113
+    '/'        shift, and go to state 114
+    '%'        shift, and go to state 115
+    '['        shift, and go to state 116
+
+    $default  reduce using rule 56 (expr)
+
+
+State 136
+
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   57     | expr '>' expr .
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    '+'        shift, and go to state 111
+    '-'        shift, and go to state 112
+    '*'        shift, and go to state 113
+    '/'        shift, and go to state 114
+    '%'        shift, and go to state 115
+    '['        shift, and go to state 116
+
+    $default  reduce using rule 57 (expr)
+
+
+State 137
+
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   58     | expr '+' expr .
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    '*'        shift, and go to state 113
+    '/'        shift, and go to state 114
+    '%'        shift, and go to state 115
+    '['        shift, and go to state 116
+
+    $default  reduce using rule 58 (expr)
+
+
+State 138
+
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   59     | expr '-' expr .
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    '*'        shift, and go to state 113
+    '/'        shift, and go to state 114
+    '%'        shift, and go to state 115
+    '['        shift, and go to state 116
+
+    $default  reduce using rule 59 (expr)
+
+
+State 139
+
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   60     | expr '*' expr .
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    '['        shift, and go to state 116
+
+    $default  reduce using rule 60 (expr)
+
+
+State 140
+
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   61     | expr '/' expr .
+   62     | expr . '%' expr
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    '['        shift, and go to state 116
+
+    $default  reduce using rule 61 (expr)
+
+
+State 141
+
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   62     | expr '%' expr .
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    '['        shift, and go to state 116
+
+    $default  reduce using rule 62 (expr)
+
+
+State 142
+
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   79 variable: expr . '[' expr ']'
+   79         | expr '[' expr . ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    TOK_EQ     shift, and go to state 104
+    TOK_NE     shift, and go to state 105
+    TOK_LE     shift, and go to state 106
+    TOK_GE     shift, and go to state 107
+    '='        shift, and go to state 108
+    '<'        shift, and go to state 109
+    '>'        shift, and go to state 110
+    '+'        shift, and go to state 111
+    '-'        shift, and go to state 112
+    '*'        shift, and go to state 113
+    '/'        shift, and go to state 114
+    '%'        shift, and go to state 115
+    '['        shift, and go to state 116
+    ']'        shift, and go to state 149
+
+
+State 143
+
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   76 callhaf: callhaf ',' expr .
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    TOK_EQ     shift, and go to state 104
+    TOK_NE     shift, and go to state 105
+    TOK_LE     shift, and go to state 106
+    TOK_GE     shift, and go to state 107
+    '='        shift, and go to state 108
+    '<'        shift, and go to state 109
+    '>'        shift, and go to state 110
+    '+'        shift, and go to state 111
+    '-'        shift, and go to state 112
+    '*'        shift, and go to state 113
+    '/'        shift, and go to state 114
+    '%'        shift, and go to state 115
+    '['        shift, and go to state 116
+
+    $default  reduce using rule 76 (callhaf)
+
+
+State 144
+
+   47 ifelse: TOK_IF '(' expr ')' . statement
+   48       | TOK_IF '(' expr ')' . statement TOK_ELSE statement
+
+    TOK_IF         shift, and go to state 53
+    TOK_WHILE      shift, and go to state 54
+    TOK_RETURN     shift, and go to state 55
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    ';'            shift, and go to state 62
+    '{'            shift, and go to state 63
+    '('            shift, and go to state 64
+
+    block       转到状态 67
+    blockhaf    转到状态 68
+    statement   转到状态 150
+    while       转到状态 70
+    ifelse      转到状态 71
+    return      转到状态 72
+    expr        转到状态 73
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 145
+
+   46 while: TOK_WHILE '(' expr ')' . statement
+
+    TOK_IF         shift, and go to state 53
+    TOK_WHILE      shift, and go to state 54
+    TOK_RETURN     shift, and go to state 55
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    ';'            shift, and go to state 62
+    '{'            shift, and go to state 63
+    '('            shift, and go to state 64
+
+    block       转到状态 67
+    blockhaf    转到状态 68
+    statement   转到状态 151
+    while       转到状态 70
+    ifelse      转到状态 71
+    return      转到状态 72
+    expr        转到状态 73
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 146
+
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   72 allocation: TOK_NEW TOK_STRING '(' expr . ')'
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    TOK_EQ     shift, and go to state 104
+    TOK_NE     shift, and go to state 105
+    TOK_LE     shift, and go to state 106
+    TOK_GE     shift, and go to state 107
+    '='        shift, and go to state 108
+    '<'        shift, and go to state 109
+    '>'        shift, and go to state 110
+    '+'        shift, and go to state 111
+    '-'        shift, and go to state 112
+    '*'        shift, and go to state 113
+    '/'        shift, and go to state 114
+    '%'        shift, and go to state 115
+    '['        shift, and go to state 116
+    ')'        shift, and go to state 152
+
+
+State 147
+
+   51 expr: expr . '=' expr
+   52     | expr . TOK_EQ expr
+   53     | expr . TOK_NE expr
+   54     | expr . TOK_LE expr
+   55     | expr . TOK_GE expr
+   56     | expr . '<' expr
+   57     | expr . '>' expr
+   58     | expr . '+' expr
+   59     | expr . '-' expr
+   60     | expr . '*' expr
+   61     | expr . '/' expr
+   62     | expr . '%' expr
+   73 allocation: TOK_NEW basetype '[' expr . ']'
+   79 variable: expr . '[' expr ']'
+   80         | expr . TOK_ARROW TOK_IDENT
+
+    TOK_ARROW  shift, and go to state 103
+    TOK_EQ     shift, and go to state 104
+    TOK_NE     shift, and go to state 105
+    TOK_LE     shift, and go to state 106
+    TOK_GE     shift, and go to state 107
+    '='        shift, and go to state 108
+    '<'        shift, and go to state 109
+    '>'        shift, and go to state 110
+    '+'        shift, and go to state 111
+    '-'        shift, and go to state 112
+    '*'        shift, and go to state 113
+    '/'        shift, and go to state 114
+    '%'        shift, and go to state 115
+    '['        shift, and go to state 116
+    ']'        shift, and go to state 153
+
+
+State 148
+
+   35 localdecl: identdecl '=' expr ';' .
+
+    $default  reduce using rule 35 (localdecl)
+
+
+State 149
+
+   79 variable: expr '[' expr ']' .
+
+    $default  reduce using rule 79 (variable)
+
+
+State 150
+
+   47 ifelse: TOK_IF '(' expr ')' statement .
+   48       | TOK_IF '(' expr ')' statement . TOK_ELSE statement
+
+    TOK_ELSE  shift, and go to state 154
+
+    $default  reduce using rule 47 (ifelse)
+
+
+State 151
+
+   46 while: TOK_WHILE '(' expr ')' statement .
+
+    $default  reduce using rule 46 (while)
+
+
+State 152
+
+   72 allocation: TOK_NEW TOK_STRING '(' expr ')' .
+
+    $default  reduce using rule 72 (allocation)
+
+
+State 153
+
+   73 allocation: TOK_NEW basetype '[' expr ']' .
+
+    $default  reduce using rule 73 (allocation)
+
+
+State 154
+
+   48 ifelse: TOK_IF '(' expr ')' statement TOK_ELSE . statement
+
+    TOK_IF         shift, and go to state 53
+    TOK_WHILE      shift, and go to state 54
+    TOK_RETURN     shift, and go to state 55
+    TOK_NULL       shift, and go to state 26
+    TOK_NEW        shift, and go to state 56
+    TOK_NOT        shift, and go to state 57
+    TOK_IDENT      shift, and go to state 82
+    TOK_INTCON     shift, and go to state 27
+    TOK_CHARCON    shift, and go to state 28
+    TOK_STRINGCON  shift, and go to state 29
+    '+'            shift, and go to state 59
+    '-'            shift, and go to state 60
+    ';'            shift, and go to state 62
+    '{'            shift, and go to state 63
+    '('            shift, and go to state 64
+
+    block       转到状态 67
+    blockhaf    转到状态 68
+    statement   转到状态 155
+    while       转到状态 70
+    ifelse      转到状态 71
+    return      转到状态 72
+    expr        转到状态 73
+    allocation  转到状态 74
+    call        转到状态 75
+    callhaf     转到状态 76
+    variable    转到状态 77
+    constant    转到状态 78
+
+
+State 155
+
+   48 ifelse: TOK_IF '(' expr ')' statement TOK_ELSE statement .
+
+    $default  reduce using rule 48 (ifelse)

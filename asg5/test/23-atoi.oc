@@ -1,0 +1,47 @@
+// $Id: 23-atoi.oc,v 1.20 2018-05-16 15:52:29-07 - - $
+
+#include "oclib.h"
+
+int atoi (string str) {
+   bool neg = false;
+   int num = 0;
+   int digit = 0;
+   bool contin = 0;
+   char c = 0;
+   assert (str != null);
+   if (str[0] != '\0') {
+      if (str[0] == '-') {
+         digit = digit + 1;
+         neg = true;
+      }
+      contin = true;
+      while (contin) {
+         if (str[digit] == '\0') {
+            contin = false;
+         }else {
+            c = str[digit];
+            digit = digit + 1;
+            if (c < '0') contin = false;
+            else if (c > '9') contin = false;
+            else num = num * 10 + c - '0';
+         }
+      }
+      if (neg) num = - num;
+   }
+   return num;
+}
+
+int main (int argc, string[] argv) {
+   int argi = 1;
+   string arg = null;
+   while (argi < argc) {
+      arg = argv[argi];
+      putstr (arg);
+      putstr (" = ");
+      putint (atoi (arg));
+      putchar ('\n');
+      argi = argi + 1;
+   }
+   return EXIT_SUCCESS;
+}
+
