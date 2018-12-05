@@ -1,5 +1,0 @@
-
-int a(){
-    if (a) a; else b;
-    if (10) +b; if("aaa") a+b; else a-b;
-}

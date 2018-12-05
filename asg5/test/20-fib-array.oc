@@ -1,0 +1,33 @@
+// $Id: 20-fib-array.oc,v 1.12 2018-11-26 15:38:20-08 - - $
+//
+// Put Fibonacci numbers in an array, then print them.
+//
+
+#include "oclib.h"
+
+#define FIB_SIZE 30
+int[] fibonacci = null;
+
+int main() {
+   int index = 2;
+   fibonacci = new int[FIB_SIZE];
+   fibonacci[0] = 0;
+   fibonacci[1] = 1;
+
+   while (index < FIB_SIZE) {
+      fibonacci[index] = fibonacci[index - 1] + fibonacci[index - 2];
+      index = index + 1;
+   }
+
+   index = 0;
+   putstr ("Numeri di figlio Bonacci\n");
+   while (index < FIB_SIZE) {
+      putstr ("fibonacci[");
+      putint (index);
+      putstr ("] = ");
+      putint (fibonacci[index]);
+      putchar ('\n');
+      index = index + 1;
+   }
+}
+

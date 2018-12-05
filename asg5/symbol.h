@@ -29,18 +29,18 @@ struct symbol_node {
     location lloc;
     size_t block_nr;
     vector<symbol_node*>* parameters;
-    string type_name;
+    const char* type_name;
 
     symbol_node(location lloc, size_t nr);
     symbol_node();
-    void dump(const string* name, FILE* file);
+    void dump(const char* name, FILE* file);
 };
 
 enum class types {
     BINOP, UNOP, COMPARE, RETURN, VARDECL, ASSIGN,
     NEW, NEWSTR, NEWARRAY, IDENT, TYPEID,
     CALL, INDEX, FILED, INTCON, STRCON, NULLCON,
-    NOMATTER
+    STRING, INT, NOMATTER
 };
 
 struct symbol_generator {
@@ -55,6 +55,7 @@ struct symbol_generator {
     symbol_generator(FILE* file);
     symbol_generator();
     void generate(astree* root);
+    void _generate(astree* root);
     void type_check(astree* root);
     symbol_node* lookup_struct(astree* root);
     symbol_node* lookup_var(astree* root);

@@ -1,0 +1,15 @@
+// $Id: 14-ocecho.oc,v 1.9 2018-04-17 16:55:18-07 - - $
+
+#include "oclib.h"
+
+int main(int argc, string[] argv) {
+   int argi = 1;
+   while (argi < argc) {
+      if (argi > 1) putchar (' ');
+      putstr (argv[argi]);
+      argi = argi + 1;
+   }
+   putstr ("\n");
+   return EXIT_SUCCESS;
+}
+

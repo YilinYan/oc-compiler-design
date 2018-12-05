@@ -134,7 +134,7 @@ void astree::print (FILE* outfile, astree* tree, int depth) {
                }
                else
                fprintf(outfile, " \"%s\"", 
-                       tree->symbol_item->type_name.c_str());
+                       tree->symbol_item->type_name);
            }
        }
    }

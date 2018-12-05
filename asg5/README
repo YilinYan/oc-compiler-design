@@ -26,3 +26,5 @@ oc [-ly] [-@ flags] [-D string] program.oc
 -@ r Enable readlines debug
 -@ o Enable getoptions debug
 -@ w Enable write_str open_tok debug
+-@ s Enable string_set debug
+-@ S Enable symbol table debug

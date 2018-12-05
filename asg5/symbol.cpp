@@ -9,6 +9,15 @@
 
 #define SOME_NUM 0x3f3f3f3f
 
+const char* get_decl_name(astree* root) {
+    if (root->children.size() == 0) {
+        DEBUGF('S', "get_decl_name: %s have NO children\n\n",
+                root->lexinfo->c_str());
+        return root->lexinfo->c_str();
+    }
+    return (*(root->children.end() - 1))->lexinfo->c_str();
+}
+
 symbol_generator::symbol_generator() {
     structure = new symbol_table();
     global = new symbol_table();
@@ -73,7 +82,9 @@ types type_name_hash(const char* s) {
             {"CHARCON", types::INTCON},
             {"STRINGCON", types::STRCON},
             {"INTCON", types::INTCON},
-            {"NULL", types::NULLCON}
+            {"NULL", types::NULLCON},
+            {"STRING", types::STRING},
+            {"INT", types::INT},
     };
     auto iter = hash.find(string(s));
 
@@ -146,6 +157,9 @@ void symbol_generator::type_check(astree* root) {
         a = root->children[0];
     if(root->children.size() > 1)
         b = root->children[1];
+
+    DEBUGF('S', "type check: %s -> %s\n",
+            root->lexinfo->c_str(), tname);
 
     size_t shr{};
     switch(type) {
@@ -334,7 +348,12 @@ void symbol_generator::type_check(astree* root) {
             type_set(root, attr::NULLX);
             type_set(root, attr::CONST);
             break;
-
+        case types::STRING:
+            type_set(root, attr::STRING);
+            break;
+        case types::INT:
+            type_set(root, attr::INT);
+            break;
         default:
             break;
     }
@@ -384,14 +403,15 @@ symbol_node* symbol_generator::lookup_var(astree* root) {
     return nullptr;
 }
 
-void table_insert(const string& s, symbol_node* node, 
+int table_insert(const string& s, symbol_node* node, 
         symbol_table* table) {
     auto i = table->find(s);
     if(i == table->end()) {
         table->insert({s, node});
-        return;
+        return 0;
     }
     errllocprintf(node->lloc, "duplicate variable %s\n", s.c_str()); 
+    return -1;
 }
 
 symbol_node* symbol_generator::ident_decl
@@ -516,21 +536,21 @@ void symbol_table_dump(symbol_table* table, FILE* outfile) {
             return l.offset < r.offset; });
     for(auto i: V) {
         fprintf(outfile, "   ");
-        i.second->dump(&(i.first), outfile);
+        i.second->dump(i.first.c_str(), outfile);
     }
 }
 
-void symbol_node::dump(const string* name, FILE* outfile) {
+void symbol_node::dump(const char* name, FILE* outfile) {
     fprintf(outfile, "%s (%zd.%zd.%zd) {%zd} %s",
-            name->c_str(), lloc.filenr, lloc.linenr, lloc.offset,
+            name, lloc.filenr, lloc.linenr, lloc.offset,
             block_nr, attrs_to_string(attributes, type_name).c_str());
     if(sequence != SOME_NUM)
         fprintf(outfile, " %zd", sequence);
     fprintf(outfile, "\n");
 }
 
-symbol_node* lookup_fun(const string& s, symbol_table* global) {
-    auto type = global->find(s);
+symbol_node* lookup_fun(const char* s, symbol_table* global) {
+    auto type = global->find(string(s));
     if(type != global->end()) {
         return type->second;
     }
@@ -574,68 +594,105 @@ void symbol_generator::func_stmt(astree* root, symbol_table* table) {
         }
     }
 }
+void get_children(astree* root, astree* &l, astree* &m, astree* &r) {
+    if(root->children.size() < 3) {
+        DEBUGF('S', "get_children: %s DONT have 3 children\n\n",
+                root->lexinfo->c_str());
+        return;
+    }
+    l = root->children[0];
+    m = root->children[1];
+    r = root->children[2];
+}
 
-void symbol_generator::generate(astree* root) {
+void get_children(astree* root, astree* &l, astree* &r) {
+    if(root->children.size() < 2) {
+        DEBUGF('S', "get_children: %s DONT have 2 children\n\n",
+                root->lexinfo->c_str());
+        if(root->children.size()) l = root->children[0];
+        else
+            DEBUGF('S', "get_children: %s DONT have 1 children\n\n",
+                root->lexinfo->c_str());
+        return;
+    }
+    l = root->children[0];
+    r = root->children[1];
+}
 
-    astree* l = nullptr;
-    astree* r = nullptr;
-    if(root->children.size())
-        l = root->children[0];
-    if(root->children.size() > 1)
-        r = root->children[1];
-
+void symbol_generator::_generate(astree* root) {
     const char* tname = parser::get_tname (root->symbol);
-    if (strstr (tname, "TOK_") == tname) tname += 4;
+    DEBUGF('S', "generate: get_tname %s\n\n", tname);
+    if (!tname) return;
+    if(strstr(tname, "TOK_") == tname) tname += 4;
 
     if (!strcmp(tname, "FUNCTION")) {
-
+        astree* a_ret = nullptr;
+        astree* a_param = nullptr;
+        astree* a_stmt = nullptr;
+        //create a vector of params
         vector<symbol_node*>* params = new vector<symbol_node*>();
+        // create a new table
         symbol_table* table = new symbol_table();
-        local = table;
 
+        get_children(root, a_ret, a_param, a_stmt); 
         block_nr = ++block_nxt;
-        int j = 0;
-        for(auto i = r->children.begin();
-                i != r->children.end(); ++i, ++j) {
-            symbol_node* para = ident_decl(*i, table, "param", j);
-            if(para != nullptr) {
-                params->push_back(para);
-            }
+
+        //add params
+        int count = 0;
+        for(auto i = a_param->children.begin();
+                i != a_param->children.end(); ++i, ++count) {
+            symbol_node* para = ident_decl(*i, table, "param", count);
+            if(para != nullptr) params->push_back(para);
+            DEBUGF('S', "param: %s -> %s\n\n",
+                   get_decl_name(a_ret),
+                   get_decl_name(*i));
         }
 
-        astree* func_name = *(l->children.end() - 1);
-        symbol_node* proto = lookup_fun(*(func_name->lexinfo), global);
-        if(proto == nullptr) {
-            symbol_node* func = ident_decl(l, global, "func", 
-                    SOME_NUM);
-            if(func != nullptr) {
-                func->parameters = params;
-                proto = func;
-            }
-            else {
-            }
-        }
-        else if(!is_compatible(params, proto->parameters)) {
+        //find if there is a proto
+        symbol_node* proto = lookup_fun(get_decl_name(a_ret), global);
+        //do not match
+        if(proto != nullptr &&
+                !is_compatible(params, proto->parameters)) {
             errllocprintf(root->lloc, 
                     "incompatible function prototype %s\n", 
-                    func_name->lexinfo->c_str());
+                    get_decl_name(a_ret));
             return;
         }
 
-        func_node = proto;
-        func_node->dump(func_name->lexinfo, outfile);
-        func_stmt(root->children[2], table);
+        //do have a proto
+        if(proto) {
+            func_node = proto;
+            DEBUGF('S', "proto exists: %s\n\n", 
+                    get_decl_name(a_ret));
+        }
+        //do not have a proto
+        else {
+            func_node = ident_decl(a_ret, global, "func", 
+                    SOME_NUM);
+            if(func_node != nullptr)
+                func_node->parameters = params;
+        }
 
+        //switch local table
+        local = table;
+        //add stmts
+        func_stmt(a_stmt, local);
+        //dump
+        func_node->dump(get_decl_name(a_ret), outfile);
         symbol_table_dump(local, outfile);
+        //switch back to global table
         local = global;
     }
 
     else if(!strcmp(tname, "PROTO")) {
-
+        astree* l = nullptr;
+        astree* r = nullptr;
+        get_children(root, l, r);
+        
         symbol_node* func = ident_decl(l, global, "func", SOME_NUM);
+
         if(func != nullptr) {
-            astree* func_name = *(l->children.end() - 1);
-            func->dump(func_name->lexinfo, outfile);
+            func->dump(get_decl_name(l), outfile);
             func->parameters = new vector<symbol_node*>();
             symbol_table* table = new symbol_table();
             local = table;
@@ -656,64 +713,92 @@ void symbol_generator::generate(astree* root) {
 
     }
     else if (!strcmp(tname, "STRUCT")) {
+        astree* a_name = nullptr;
+        astree* a_field = nullptr;
+        get_children(root, a_name, a_field);
 
         block_nr = 0;
+        //create a new table for field
         symbol_table* table = new symbol_table();
-        symbol_node* node = new symbol_node(l->lloc, 0);
+        //create a new node
+        symbol_node* node = new symbol_node(a_name->lloc, 0);
         type_set(node, attr::STRUCT);
         type_set(node, attr::TYPEID);
         node->fields = table;
-        node->type_name = *(l->lexinfo);
+        node->type_name = get_decl_name(a_name);
         node->sequence = SOME_NUM;
-        table_insert(*(l->lexinfo), node, structure);
-        //        table_insert(*(l->lexinfo), node, table); 
+        //insert into struct table
+        DEBUGF('S', "struct insert\n");
+        int rt = table_insert(string(get_decl_name(a_name)),
+                    node, structure);
+        if(rt == -1) return;
 
-        node->dump(l->lexinfo, outfile);
-        l->symbol_item = node;
-        l->attributes = node->attributes;
+        //bind to astree node
+        DEBUGF('S', "struct bind ast\n");
+        a_name->symbol_item = node;
+        a_name->attributes = node->attributes;
 
-        int j = 0;
-        for(auto i = r->children.begin();
-                i != r->children.end(); ++i, ++j) {
-            ident_decl(*i, table, "field", j);
+        if(a_field) {
+            int j = 0;
+            for(auto i = a_field->children.begin();
+                    i != a_field->children.end(); ++i, ++j) {
+                ident_decl(*i, table, "field", j);
+                DEBUGF('S', "field: %s -> %s\n\n",
+                       node->type_name,
+                       get_decl_name(*i)); 
+            }
         }
+        //dump
+        DEBUGF('S', "struct dump\n");
+        node->dump(node->type_name, outfile);
         symbol_table_dump(table, outfile); 
     }
 
     else if(!strcmp(tname, "VARDECL")) {       
+        astree* l = nullptr;
+        astree* r = nullptr;
+        get_children(root, l, r);
 
         block_nr = 0;
         type_check(r);
         symbol_node* var = ident_decl(l, global, "ident", SOME_NUM);
-        if(var == nullptr) {
+        if(var == nullptr) return;
+
+        if(is_compatible(var->attributes, r->attributes)) {
+            var->dump(get_decl_name(l), outfile);
+            DEBUGF('S', "global var decl: %s\n\n", 
+                    get_decl_name(l));
+            return;
         }
-        else if(is_compatible(var->attributes, r->attributes)){
-            //           type_set(root, var->attributes);
-            astree* decl_name = *(l->children.end() - 1);
-            var->dump(decl_name->lexinfo, outfile);
-        }
-        else {
-            errllocprintf(root->lloc,
-                    "incompatible types for %s\n", 
-                    root->lexinfo->c_str());
-            print_attr(var->attributes, var->type_name);
-            string tmp = "";
-            if(r->symbol_item != nullptr)
-                tmp = r->symbol_item->type_name;
-            print_attr(r->attributes, tmp);
-        }
-    }
-    else if(!strcmp(tname, "ROOT")) {
-        for(auto i = root->children.begin();
-                i != root->children.end(); ++i)
-            generate(*i);
+        errllocprintf(root->lloc,
+                "incompatible types for %s\n", 
+                root->lexinfo->c_str());
+        print_attr(var->attributes, var->type_name);
+        string tmp = "";
+        if(r->symbol_item != nullptr)
+            tmp = r->symbol_item->type_name;
+        print_attr(r->attributes, tmp);
     }
     else {
-
         errllocprintf(root->lloc, 
                 "symbol_generate: invalid: %s\n", 
                 root->lexinfo->c_str());
     }
 }
 
+void symbol_generator::generate(astree* root) {
+    const char* tname = parser::get_tname (root->symbol);
+    if(tname && strstr (tname, "TOK_") == tname) tname += 4;
+
+    if(tname && !strcmp(tname, "ROOT")) {
+        for(auto i = root->children.begin();
+                i != root->children.end(); ++i)
+            _generate(*i);
+    }
+    else {
+        errllocprintf(root->lloc, 
+            "symbol_generate: invalid root: %s\n", 
+            root->lexinfo->c_str());
+    }
+}
 
