@@ -15,6 +15,13 @@ struct interm_generator {
     void gen_field(astree* root);
     
     void gen_str_con(astree* root);
+
+    void gen_global_var(astree* root);
+
+    void gen_func(astree* root);
+    void gen_param(astree* root);
+    void gen_local_var(astree* root);
+    const char* gen_expr(astree* root);
 };
 
 #endif

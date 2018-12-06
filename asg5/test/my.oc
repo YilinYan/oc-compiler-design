@@ -6,6 +6,10 @@ struct foo {
    int a;
 }
 
+int this_is_a_int = 10;
+
+foo this_is_a_foo = null;
+
 struct bar {
     foo foo_instance;
     int a;
@@ -17,10 +21,18 @@ struct bar {
 
 string a = "this_is_string_a!\n";
 
+int this_is_a_func(int a, int b, foo c) {
+    int some_int = a + b;
+    int some_other_int = + a - b + 10;
+    foo a_foo = null;
+    return a;
+}
+
 int main() {
    string t = "this_is_string_t!";
    int a = 6;
    foo b = new foo;
+   int[] some_array = null;
    b->a = 8;
    a = a * b->a + 6;;
    putint (a);

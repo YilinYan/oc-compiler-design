@@ -2,6 +2,8 @@
 #include "lyutils.h"
 #include "symbol.h"
 
+#include <string>
+
 #include <string.h>
 
 const char* get_yy_name(astree* root) {
@@ -15,6 +17,15 @@ interm_generator::interm_generator(FILE* file) {
     type_name = NULL;
 }
 
+const char* string_to_char(string s) {
+//    DEBUGF('I', "string to char: %s\n", s.c_str());
+
+    char* rt = new char[s.size() + 1];
+    memset(rt, 0, sizeof(char) * (s.size() + 1));
+    snprintf(rt, s.size() + 1, "%s", s.c_str());
+    return rt;
+}
+
 const char* get_oil_type(astree* root) {
     //int string void struct []
     astree* var;
@@ -23,8 +34,8 @@ const char* get_oil_type(astree* root) {
         var = *(root->children.end() - 1);
     else {
         var = root;
-        DEBUGF('I', "get oil type struct: %s\n\n",
-                get_decl_name(var));
+//        DEBUGF('I', "get oil type struct: %s\n\n",
+//                get_decl_name(var));
     }
     if(type_test(var, attr::ARRAY)) {
         if(type_test(var, attr::INT))
@@ -33,9 +44,10 @@ const char* get_oil_type(astree* root) {
             return "char**";
         if(type_test(var, attr::STRUCT)) {
             node = var->symbol_item;
-            if(node && node->type_name)
-                return ("struct " + string(node->type_name) + "**"
-                        ).c_str();
+            if(node && node->type_name) {
+                return string_to_char("struct " 
+                        + string(node->type_name) + "**");
+            }
             DEBUGF('I', "get oil type struct[] INVALID: %s\n\n",
                     get_decl_name(var));
         }
@@ -53,9 +65,10 @@ const char* get_oil_type(astree* root) {
     }
     else if(type_test(var, attr::STRUCT)) {
         node = var->symbol_item;
+        //overflow ??
         if(node && node->type_name)
-            return ("struct " + string(node->type_name) + "*"
-                   ).c_str();
+            return string_to_char("struct " + string(node->type_name) 
+                    + "*");
         DEBUGF('I', "get oil type struct INVALID: %s\n\n",
                 get_decl_name(var));
     }
@@ -77,9 +90,6 @@ void interm_generator::gen_struct(astree* root) {
     get_children(root, name, block);
     type_name = get_decl_name(name);
 
-    DEBUGF('I', "gen struct: %s\n\n", 
-            type_name);
-    
     fprintf(outfile, "struct %s {\n", 
             type_name);
     for(size_t i = 0; i < block->children.size(); ++i) {
@@ -98,10 +108,196 @@ void interm_generator::gen_str_con(astree* root) {
     const char* name = get_yy_name(root);
     if(strcmp(name, "STRINGCON")) return;
 
-    const char* reg_name = ("s" + to_string(++seq_nr)).c_str();
+    const char* reg_name = string_to_char("s" + to_string(++seq_nr));
     root->reg_name = reg_name;
     fprintf(outfile, "char* %s = %s;\n", reg_name,
             root->lexinfo->c_str());
+}
+
+void interm_generator::gen_global_var(astree* root) {
+    astree* type;
+    if(root->children.size())
+        type = root->children[0];
+    else {
+        DEBUGF('I', "gen global var: %s NO children\n",
+                get_decl_name(root));
+        return;
+    }
+    const char* reg_name = get_decl_name(type);
+    root->reg_name = reg_name;
+
+    fprintf(outfile, "%s ", get_oil_type(type));
+    fprintf(outfile, "%s;\n", reg_name);
+}
+
+void interm_generator::gen_param(astree* root) {
+    DEBUGF('I', "gen param: %d %s\n",
+            root->block_nr, get_decl_name(root));
+    const char* reg_name;    
+    
+    fprintf(outfile, "%s ", get_oil_type(root));
+    
+    reg_name = string_to_char("_" + to_string(root->block_nr)
+        + "_" + string(get_decl_name(root)));
+    root->reg_name = reg_name;
+
+    fprintf(outfile, "%s", reg_name);
+}
+
+const char* interm_generator::gen_expr(astree* root) {
+    attr_bitset& attrs = root->attributes;
+    const char* oper = get_yy_name(root);
+    
+    if(type_test(attrs, attr::VREG)) {
+        if(!strcmp(oper, "CALL")) {
+            if(!root->children.size()) {
+                DEBUGF('I', "call INVALID\n");
+                return NULL;
+            }
+            astree* func = root->children[0];
+            attr_bitset& attrs = func->attributes;
+            // not void, need a REG
+            if(!type_test(attrs, attr::VOID)) {
+                const char* type = get_oil_type(func);
+                const char* reg;
+                if(!type_test(attrs, attr::ARRAY) &&
+                        type_test(attrs, attr::INT))
+                    reg = string_to_char("i" + to_string(++seq_nr));
+                else
+                    reg = string_to_char("p" + to_string(++seq_nr));
+
+                if(!type || !reg) {
+                    DEBUGF('I', "call ret INVALID\n");
+                    return NULL;
+                }
+                fprintf(outfile, "%s %s = ", type, reg);
+            }
+            fprintf(outfile, "\n");
+            return NULL;
+        }
+        else if(!strcmp(oper, "NEWSTR")) {
+        
+        }
+        else if(!strcmp(oper, "NEWARRAY")) {
+        
+        }
+        else if(!strcmp(oper, "NEW")) {
+        
+        }
+        // unop
+        else if(root->children.size() == 1) {
+            const char* rreg = gen_expr(root->children[0]);
+            const char* lreg = string_to_char("i" + 
+                    to_string(++seq_nr));
+            fprintf(outfile, "\t%s = %s %s;\n", lreg,
+                    root->lexinfo->c_str(), rreg);
+            return lreg;
+        }
+        // binop
+        else if(root->children.size() == 2) {
+            const char* lreg = gen_expr(root->children[0]);
+            const char* rreg = gen_expr(root->children[1]);
+            const char* mreg = string_to_char("i" + 
+                    to_string(++seq_nr));
+            fprintf(outfile, "\t%s = %s %s %s;\n", mreg, lreg,
+                    root->lexinfo->c_str(), rreg);
+            return mreg;
+        } 
+        else {
+            DEBUGF('I', "get expr INVALID VREG: %s\n",
+                    root->lexinfo->c_str());
+        }
+    }
+    else if(type_test(attrs, attr::CONST)) {
+        if(type_test(attrs, attr::NULLX)) {
+            return string_to_char("0");
+        }
+        else if(type_test(attrs, attr::INT)) {
+            return string_to_char(*(root->lexinfo));
+        }
+        else if(type_test(attrs, attr::STRING)) {
+            return root->reg_name;
+        }
+        else {
+            DEBUGF('I', "get expr INVALID CONS: %s\n",
+                    root->lexinfo->c_str());
+        }
+    }
+    else if(type_test(attrs, attr::VARIABLE)) {
+        if(type_test(attrs, attr::LOCAL) ||
+                type_test(attrs, attr::PARAM))
+            return string_to_char("_" + to_string(root->block_nr)
+                    + "_" + *(root->lexinfo));
+        else
+            return string_to_char(*(root->lexinfo));
+    }
+    else if(type_test(attrs, attr::VADDR)) {
+            
+    }
+    else {
+        DEBUGF('I', "gen expr INVALID: %s",
+                root->lexinfo->c_str());
+    }
+    return "some_reg_name";
+}
+
+void interm_generator::gen_local_var(astree* root) {
+    astree* name;
+    astree* expr;
+    get_children(root, name, expr);
+    if(!name || !expr) {
+        DEBUGF('I', "gen local var: %s INVALID\n\n",
+                get_decl_name(root));
+        return;
+    }
+    DEBUGF('I', "gen local var: %s\n", get_decl_name(name));
+
+    const char* type = get_oil_type(name);
+    const char* rreg = gen_expr(expr);
+    const char* lreg = string_to_char("_" + to_string(root->block_nr) 
+            + "_" + string(get_decl_name(name)));
+    fprintf(outfile, "\t%s %s = %s;\n", type, lreg, rreg);
+}
+
+void interm_generator::gen_func(astree* root) {
+    astree* name;
+    astree* param;
+    astree* block;
+    get_children(root, name, param, block);
+    if(!name || !param || !block) {
+        DEBUGF('I', "gen func: NOT enough children\n");
+        return;
+    }
+    // dump func name
+    fprintf(outfile, "%s ", get_oil_type(name));
+    fprintf(outfile, "%s (", get_decl_name(name));
+    
+    // dump params
+    if(!param->children.size())
+        fprintf(outfile, "void)\n");
+    else
+        fprintf(outfile, "\n");
+    for(size_t i = 0; i < param->children.size(); ++i) {
+        fprintf(outfile, "\t");
+        gen_param(param->children[i]);
+        if(i + 1 == param->children.size())
+            fprintf(outfile, ")\n");
+        else
+            fprintf(outfile, ",\n");
+    }
+
+    // dump stmts
+    fprintf(outfile, "{\n");
+    // dump local decl
+    size_t i = 0;
+    for(; i < block->children.size(); ++i) {
+        astree* child = block->children[i];
+        const char* name = get_yy_name(child);
+       
+        if(strcmp(name, "VARDECL")) break;
+        gen_local_var(child);
+    }
+    fprintf(outfile, "}\n");
 }
 
 void interm_generator::generate(astree* root) {
@@ -121,4 +317,21 @@ void interm_generator::generate(astree* root) {
 
     // get all STRINGCON
     gen_str_con(root);
+
+    // get all global var
+    for(size_t i = 0; i < root->children.size(); ++i) {
+        astree* child = root->children[i];
+        name = get_yy_name(child);
+        if(strcmp(name, "VARDECL") == 0)
+            gen_global_var(child);
+    }
+
+    //get all functions
+    for(size_t i = 0; i < root->children.size(); ++i) {
+        astree* child = root->children[i];
+        name = get_yy_name(child);
+        if(strcmp(name, "FUNCTION") == 0)
+            gen_func(child);
+    }
+
 }
