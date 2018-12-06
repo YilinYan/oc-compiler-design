@@ -170,6 +170,26 @@ const char* get_rid_star(const char* type) {
     return rt;
 }
 
+const char* add_a_star(const char* type) {
+    int len = strlen(type);
+    char* rt = new char[len + 2];
+    memset(rt, 0, sizeof(char) * (len + 1));
+    snprintf(rt + 1, len + 1, "%s", type);
+    rt[0] = '*';
+    return rt;
+}
+
+const char* get_field_reg(astree* root) {
+    symbol_node* node = root->symbol_item;
+    if(!node || !node->type_name) {
+        DEBUGF('I', "get field reg INVALID\n");
+        return NULL;
+    }
+    string s = string(node->type_name) + "_"
+        + string(get_decl_name(root));
+    return string_to_char(s);
+}
+
 const char* interm_generator::gen_expr(astree* root) {
     attr_bitset& attrs = root->attributes;
     const char* oper = get_yy_name(root);
@@ -296,8 +316,35 @@ const char* interm_generator::gen_expr(astree* root) {
         else
             return string_to_char(*(root->lexinfo));
     }
+    // selection !
     else if(type_test(attrs, attr::VADDR)) {
-            
+        const char* select = get_yy_name(root);
+        astree* l;
+        astree* r;
+        get_children(root, l, r);
+        if(!strcmp(select, "ARROW")) {
+            const char* expr = gen_expr(l);
+            const char* field = get_field_reg(r);
+            const char* type = get_oil_type(r);
+            const char* reg = string_to_char("a"
+                    + to_string(++seq_nr));
+            fprintf(outfile, "\t%s* %s = &%s->%s;\n",
+                    type, reg, expr, field);
+            return add_a_star(reg);
+        }
+        else if(!strcmp(select, "INDEX")) {
+            const char* lreg = gen_expr(l);
+            const char* rreg = gen_expr(r);
+            const char* type = get_oil_type(root);
+            const char* reg = string_to_char("a"
+                    + to_string(++seq_nr));
+            fprintf(outfile, "\t%s* %s = &%s[%s];\n",
+                    type, reg, lreg, rreg);
+            return add_a_star(reg);
+        }
+        else
+            DEBUGF('I', "selection INVALID\n");
+        return NULL;
     }
     else {
         DEBUGF('I', "gen expr INVALID: %s",
@@ -319,8 +366,9 @@ void interm_generator::gen_local_var(astree* root) {
 
     const char* type = get_oil_type(name);
     const char* rreg = gen_expr(expr);
-    const char* lreg = string_to_char("_" + to_string(root->block_nr) 
-            + "_" + string(get_decl_name(name)));
+    const char* lreg = string_to_char(
+            "_" + to_string(root->block_nr) + 
+            "_" + string(get_decl_name(name)));
     fprintf(outfile, "\t%s %s = %s;\n", type, lreg, rreg);
 }
 

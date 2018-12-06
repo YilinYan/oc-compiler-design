@@ -23,8 +23,8 @@ string a = "this_is_string_a!\n";
 
 int this_is_a_func(int a, int b, foo c) {
     foo[] sth = new foo[a+b];
-    string[] ss = new string[10];
-    int[] ints = new int[100];
+    foo test = new foo;
+    foo aaa = sth[100];
     return a;
 }
 
