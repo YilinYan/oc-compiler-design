@@ -524,9 +524,9 @@ symbol_node* symbol_generator::ident_decl(
     var->block_nr = root->block_nr;
     var->symbol_item = symbol;
     var->attributes = symbol->attributes;
+//    root->attributes = symbol->attributes;
 
     table_insert(*(var->lexinfo), symbol, table);
-
     return symbol;
 }
 

@@ -6,7 +6,19 @@ struct foo {
    int a;
 }
 
+struct bar {
+    foo foo_instance;
+    int a;
+    string b;
+    int[] c;
+    string[] d;
+    foo[] e;
+}
+
+string a = "this_is_string_a!\n";
+
 int main() {
+   string t = "this_is_string_t!";
    int a = 6;
    foo b = new foo;
    b->a = 8;

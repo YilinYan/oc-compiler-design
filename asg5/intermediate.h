@@ -5,6 +5,7 @@
 #include "astree.h"
 
 struct interm_generator {
+    int seq_nr;
     FILE* outfile;
     interm_generator(FILE* file);
         
@@ -12,6 +13,8 @@ struct interm_generator {
     void generate(astree* root);
     void gen_struct(astree* root);
     void gen_field(astree* root);
+    
+    void gen_str_con(astree* root);
 };
 
 #endif
