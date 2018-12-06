@@ -22,17 +22,24 @@ struct bar {
 string a = "this_is_string_a!\n";
 
 int this_is_a_func(int a, int b, foo c) {
-    int some_int = a + b;
-    int some_other_int = + a - b + 10;
-    foo a_foo = null;
+    foo[] sth = new foo[a+b];
+    string[] ss = new string[10];
+    int[] ints = new int[100];
     return a;
 }
 
+int hhh = 7;
+foo xxx = null;
+
+foo get_a_foo() {
+    return new foo;
+}
+
 int main() {
-   string t = "this_is_string_t!";
-   int a = 6;
+   string t = new string(hhh + 5);
+   int a = this_is_a_int + this_is_a_func(hhh, hhh, xxx);
    foo b = new foo;
-   int[] some_array = null;
+
    b->a = 8;
    a = a * b->a + 6;;
    putint (a);

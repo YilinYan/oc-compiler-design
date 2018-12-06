@@ -79,6 +79,23 @@ const char* get_oil_type(astree* root) {
     return NULL;
 }
 
+const char* get_array_type(astree* root) {
+    astree* var = root->children[0];
+    symbol_node* node;
+    if(type_test(var, attr::INT))
+        return "int*";
+    if(type_test(var, attr::STRING))
+        return "char**";
+    if(type_test(var, attr::STRUCT)) {
+        node = var->symbol_item;
+        if(node && node->type_name) {
+            return string_to_char("struct " 
+                    + string(node->type_name) + "**");
+        }
+    }
+    return NULL;
+}
+
 void interm_generator::gen_field(astree* root) {
     fprintf(outfile, "\t%s ", get_oil_type(root));
     fprintf(outfile, "%s_%s;\n", type_name, get_decl_name(root));
@@ -144,6 +161,15 @@ void interm_generator::gen_param(astree* root) {
     fprintf(outfile, "%s", reg_name);
 }
 
+const char* get_rid_star(const char* type) {
+    int len = strlen(type);
+    char* rt = new char[len + 1];
+    memset(rt, 0, sizeof(char) * (len + 1));
+    snprintf(rt, len + 1, "%s", type);
+    rt[len-1] = '\0';
+    return rt;
+}
+
 const char* interm_generator::gen_expr(astree* root) {
     attr_bitset& attrs = root->attributes;
     const char* oper = get_yy_name(root);
@@ -156,10 +182,13 @@ const char* interm_generator::gen_expr(astree* root) {
             }
             astree* func = root->children[0];
             attr_bitset& attrs = func->attributes;
+            const char* type = NULL;
+            const char* reg = NULL;
+            
+            fprintf(outfile, "\t");
             // not void, need a REG
             if(!type_test(attrs, attr::VOID)) {
-                const char* type = get_oil_type(func);
-                const char* reg;
+                type = get_oil_type(func);
                 if(!type_test(attrs, attr::ARRAY) &&
                         type_test(attrs, attr::INT))
                     reg = string_to_char("i" + to_string(++seq_nr));
@@ -172,17 +201,53 @@ const char* interm_generator::gen_expr(astree* root) {
                 }
                 fprintf(outfile, "%s %s = ", type, reg);
             }
-            fprintf(outfile, "\n");
-            return NULL;
+            //print name
+            fprintf(outfile, "%s (", get_decl_name(func));
+            //print params
+            for(size_t i = 1; i < root->children.size(); ++i) {
+                if(i != 1) fprintf(outfile, ", ");
+                fprintf(outfile, "%s", gen_expr(root->children[i]));
+            }
+            fprintf(outfile, ");\n");
+            return reg;
         }
         else if(!strcmp(oper, "NEWSTR")) {
-        
-        }
-        else if(!strcmp(oper, "NEWARRAY")) {
-        
+            if(!root->children.size()) {
+                DEBUGF('I', "newstr INVALID\n");
+                return NULL;
+            }
+            const char* reg = string_to_char("p" + 
+                    to_string(++seq_nr));
+            const char* opnd = gen_expr(root->children[0]);
+            fprintf(outfile, 
+                    "\tchar* %s = xcalloc (%s, sizeof (char));\n",
+                    reg, opnd);
+            return reg;
         }
         else if(!strcmp(oper, "NEW")) {
-        
+            if(!root->children.size()) {
+                DEBUGF('I', "new INVALID\n");
+                return NULL;
+            }
+            const char* type = get_oil_type(root->children[0]);
+            const char* reg = string_to_char("p" + 
+                    to_string(++seq_nr));
+            fprintf(outfile, "\t%s %s = xcalloc (1, sizeof (%s));\n",
+                    type, reg, get_rid_star(type));
+            return reg;
+        }
+        else if(!strcmp(oper, "NEWARRAY")) {
+            if(root->children.size() < 2) {
+                DEBUGF('I', "newarray INVALID\n");
+                return NULL;
+            }
+            const char* type = get_array_type(root);
+            const char* reg = string_to_char("p" +
+                    to_string(++seq_nr));
+            const char* opnd = gen_expr(root->children[1]);
+            fprintf(outfile, "\t%s %s = xcalloc (%s, sizeof (%s));\n",
+                    type, reg, opnd, get_rid_star(type));
+            return reg;
         }
         // unop
         else if(root->children.size() == 1) {
