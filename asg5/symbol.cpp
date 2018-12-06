@@ -122,11 +122,21 @@ bool is_compatible(const attr_bitset& a, const attr_bitset& b) {
     bool rt = false;
     static size_t shr = static_cast<size_t>(attr::BITSET_SIZE) -
         static_cast<size_t>(attr::ARRAY);
+/*
+    cout << "--------------" << endl;
+    cout << a << "\t" << b << endl;
+    cout << (a << shr) << "\t" << (b << shr) << endl;
+    cout << ((a<<shr) == (b<<shr)) << endl;
+  */      
     rt |= ((a<<shr) == (b<<shr));
+    
+//    cout << "-----"<< rt << endl;
     rt |= ((type_test(a, attr::ARRAY)
                 || type_test(a, attr::STRUCT)
                 || type_test(a, attr::STRING)
            ) && type_test(b, attr::NULLX)); 
+//    cout << "-----"<< rt << endl;
+    
     return rt; 
 }
 
@@ -213,7 +223,13 @@ void symbol_generator::type_check(astree* root) {
                 type_set(root, a->attributes);
                 type_set(root, attr::VREG);
             }
-            else {}
+            else {
+                DEBUGF('S', "---------------assign\n%s\n%s\n",
+                        attrs_to_string(a->attributes, "").c_str(),
+                        attrs_to_string(b->attributes, "").c_str());
+                errllocprintf(root->lloc, 
+                    "%s", "incompatible assign\n");
+            }
             break;
         case types::NEW:
             type_set(root, a->attributes);
@@ -332,9 +348,9 @@ void symbol_generator::type_check(astree* root) {
                 if(i != a->symbol_item->fields->end()) {
                     DEBUGF('S', "field found: %s -> %s\n\n",
                             get_decl_name(a), get_decl_name(b));
+                    type_set(root, i->second->attributes);
                     type_set(root, attr::VADDR);
                     type_set(root, attr::LVAL);
-                    type_set(root, i->second->attributes);
                     root->symbol_item = i->second;
                     break;
                 }
@@ -438,9 +454,9 @@ int table_insert(const string& s, symbol_node* node,
     return -1;
 }
 
-symbol_node* symbol_generator::ident_decl
-(astree* root, symbol_table* table, const string& decl_type, 
- size_t seq) {
+symbol_node* symbol_generator::ident_decl(
+        astree* root, symbol_table* table, const string& decl_type,
+        size_t seq) {
     astree* l = nullptr;
     astree* r = nullptr;
     astree* var = nullptr;

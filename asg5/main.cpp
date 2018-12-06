@@ -13,6 +13,7 @@ using namespace std;
 #include "auxlib.h"
 #include "astree.h"
 #include "lyutils.h"
+#include "intermediate.h"
 
 const string CPP = "/usr/bin/cpp";
 FILE* tokfile = 0;
@@ -55,15 +56,24 @@ void readlines (string& ocname) {
     FILE* outfile = fopen (outname.c_str(), "w");
     string symbol_outname = ocname + ".sym";
     FILE* symbol_outfile = fopen(symbol_outname.c_str(), "w");
+    string oil_outname = ocname + ".oil";
+    FILE* oil_outfile = fopen(oil_outname.c_str(), "w");
 
     yyparse();
     symbol_generator* generator = new symbol_generator(symbol_outfile);
     generator->generate(yyparse_astree);
     astree::print(outfile, yyparse_astree, 0);
     
+    if(exec::exit_status == EXIT_SUCCESS) {
+        interm_generator* i_generator = 
+            new interm_generator(oil_outfile);
+        i_generator->generate(yyparse_astree);
+    }
+
+    fclose (tokfile);
     fclose (outfile);
     fclose (symbol_outfile);
-    fclose (tokfile);
+    fclose (oil_outfile);
 }
 
 void write_str (string_set& table, string& ocname) {

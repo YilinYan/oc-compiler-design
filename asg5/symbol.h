@@ -78,4 +78,7 @@ attr get_base(const astree* root);
 const string attrs_to_string(const attr_bitset& attrs, 
         const string& name);
 
+void get_children(astree* root, astree* &l, astree* &m);
+void get_children(astree* root, astree* &l, astree* &m, astree* &r); 
+const char* get_decl_name(astree* root);
 #endif
