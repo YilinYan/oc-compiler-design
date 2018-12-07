@@ -432,11 +432,12 @@ void interm_generator::gen_func_expr(astree* root) {
     }   
     else if(!strcmp(name, "RETURN")) {
         const char* expr;
-        if(root->children.size())
+        if(root->children.size()) {
             expr = gen_expr(root->children[0]);
-        fprintf(outfile, "return%s%s;", 
-                expr ? " " : "",
-                expr ? expr : "");
+            fprintf(outfile, "\treturn %s;\n", expr);
+        }
+        else
+            fprintf(outfile, "\treturn;\n");
     }
     else
         gen_expr(root);
