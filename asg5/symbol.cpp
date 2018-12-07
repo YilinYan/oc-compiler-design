@@ -304,13 +304,14 @@ void symbol_generator::type_check(astree* root) {
         case types::INDEX: 
             {
                 shr = static_cast<size_t>(attr::BITSET_SIZE) -
-                    static_cast<size_t>(attr::STRUCT);
+                    static_cast<size_t>(attr::ARRAY);
                 if((type_test(a, attr::INT) 
                             || type_test(a, attr::STRING) 
                             || type_test(a, attr::STRUCT) 
                             || type_test(a, attr::VOID)) 
                         && type_test(a, attr::ARRAY) && 
                         type_test(b, attr::INT)) {
+                    
                     type_set(root, (a->attributes<<shr)>>shr);
                     type_set(root, attr::VADDR);
                     type_set(root, attr::LVAL);
@@ -348,10 +349,17 @@ void symbol_generator::type_check(astree* root) {
                 if(i != a->symbol_item->fields->end()) {
                     DEBUGF('S', "field found: %s -> %s\n\n",
                             get_decl_name(a), get_decl_name(b));
+                   
+                   
                     type_set(root, i->second->attributes);
                     type_set(root, attr::VADDR);
                     type_set(root, attr::LVAL);
                     root->symbol_item = i->second;
+                    
+                    type_set(b, i->second->attributes);
+                    b->symbol_item = i->second;
+                    b->symbol_item->type_name = 
+                        a->symbol_item->type_name;
                     break;
                 }
                 const astree* l = a;

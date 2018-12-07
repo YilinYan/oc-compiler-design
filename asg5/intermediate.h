@@ -22,6 +22,8 @@ struct interm_generator {
     void gen_param(astree* root);
     void gen_local_var(astree* root);
     const char* gen_expr(astree* root);
+
+    void gen_func_expr(astree* root);
 };
 
 #endif

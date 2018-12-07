@@ -205,7 +205,15 @@ const char* interm_generator::gen_expr(astree* root) {
             const char* type = NULL;
             const char* reg = NULL;
             
+            string param_str = "";
+            //gen params
+            for(size_t i = 1; i < root->children.size(); ++i) {
+                if(i != 1) param_str += ", ";
+                param_str += string(gen_expr(root->children[i]));
+            }
+
             fprintf(outfile, "\t");
+
             // not void, need a REG
             if(!type_test(attrs, attr::VOID)) {
                 type = get_oil_type(func);
@@ -221,14 +229,10 @@ const char* interm_generator::gen_expr(astree* root) {
                 }
                 fprintf(outfile, "%s %s = ", type, reg);
             }
+
             //print name
             fprintf(outfile, "%s (", get_decl_name(func));
-            //print params
-            for(size_t i = 1; i < root->children.size(); ++i) {
-                if(i != 1) fprintf(outfile, ", ");
-                fprintf(outfile, "%s", gen_expr(root->children[i]));
-            }
-            fprintf(outfile, ");\n");
+            fprintf(outfile, "%s);\n", param_str.c_str());
             return reg;
         }
         else if(!strcmp(oper, "NEWSTR")) {
@@ -269,12 +273,20 @@ const char* interm_generator::gen_expr(astree* root) {
                     type, reg, opnd, get_rid_star(type));
             return reg;
         }
+        // assign
+        else if(root->children.size() == 2 && 
+                *(root->lexinfo) == "=") {
+            const char* lreg = gen_expr(root->children[0]);
+            const char* rreg = gen_expr(root->children[1]);
+            fprintf(outfile, "\t%s = %s;\n", lreg, rreg);
+            return lreg;
+        }
         // unop
         else if(root->children.size() == 1) {
             const char* rreg = gen_expr(root->children[0]);
             const char* lreg = string_to_char("i" + 
                     to_string(++seq_nr));
-            fprintf(outfile, "\t%s = %s %s;\n", lreg,
+            fprintf(outfile, "\tint %s = %s %s;\n", lreg,
                     root->lexinfo->c_str(), rreg);
             return lreg;
         }
@@ -284,7 +296,7 @@ const char* interm_generator::gen_expr(astree* root) {
             const char* rreg = gen_expr(root->children[1]);
             const char* mreg = string_to_char("i" + 
                     to_string(++seq_nr));
-            fprintf(outfile, "\t%s = %s %s %s;\n", mreg, lreg,
+            fprintf(outfile, "\tint %s = %s %s %s;\n", mreg, lreg,
                     root->lexinfo->c_str(), rreg);
             return mreg;
         } 
@@ -347,7 +359,7 @@ const char* interm_generator::gen_expr(astree* root) {
         return NULL;
     }
     else {
-        DEBUGF('I', "gen expr INVALID: %s",
+        DEBUGF('I', "gen expr INVALID: %s\n",
                 root->lexinfo->c_str());
     }
     return "some_reg_name";
@@ -370,6 +382,64 @@ void interm_generator::gen_local_var(astree* root) {
             "_" + to_string(root->block_nr) + 
             "_" + string(get_decl_name(name)));
     fprintf(outfile, "\t%s %s = %s;\n", type, lreg, rreg);
+}
+
+void interm_generator::gen_func_expr(astree* root) {
+    const char* name = get_yy_name(root);
+    if(!strcmp(name, "BLOCK")) {
+        for(size_t i = 0; i < root->children.size(); ++i)
+            gen_func_expr(root->children[i]);
+    }
+    else if(!strcmp(name, "WHILE")) {
+        if(root->children.size() < 2) {
+            DEBUGF('I', "while NOT enough children\n");
+            return;
+        }
+        const char* lloc = string_to_char("_" + 
+                to_string(root->lloc.filenr) + "_" +
+                to_string(root->lloc.linenr) + "_" +
+                to_string(root->lloc.offset));
+        const char* opnd;
+        fprintf(outfile, "while%s:;\n", lloc);
+        opnd = gen_expr(root->children[0]);
+        fprintf(outfile, "\tif (!%s) goto break%s;\n", opnd, lloc);
+        gen_func_expr(root->children[1]);
+        fprintf(outfile, "\tgoto while%s;\n", lloc);
+        fprintf(outfile, "break%s:;\n", lloc);
+    }
+    else if(!strcmp(name, "IF") && root->children.size() == 2) {
+        const char* lloc = string_to_char("_" + 
+                to_string(root->lloc.filenr) + "_" +
+                to_string(root->lloc.linenr) + "_" +
+                to_string(root->lloc.offset));
+        const char* opnd = gen_expr(root->children[0]);
+        fprintf(outfile, "\tif (!%s) goto fi%s;\n", opnd, lloc);
+        gen_func_expr(root->children[1]);
+        fprintf(outfile, "fi%s:;\n", lloc);
+    }
+    else if(!strcmp(name, "IF") && root->children.size() == 3) {
+        const char* lloc = string_to_char("_" + 
+                to_string(root->lloc.filenr) + "_" +
+                to_string(root->lloc.linenr) + "_" +
+                to_string(root->lloc.offset));
+        const char* opnd = gen_expr(root->children[0]);
+        fprintf(outfile, "\tif (!%s) goto else%s;\n", opnd, lloc);
+        gen_func_expr(root->children[1]);
+        fprintf(outfile, "\tgoto fi%s;\n", lloc);
+        fprintf(outfile, "else%s:;\n", lloc);
+        gen_func_expr(root->children[2]);
+        fprintf(outfile, "fi%s:;\n", lloc);
+    }   
+    else if(!strcmp(name, "RETURN")) {
+        const char* expr;
+        if(root->children.size())
+            expr = gen_expr(root->children[0]);
+        fprintf(outfile, "return%s%s;", 
+                expr ? " " : "",
+                expr ? expr : "");
+    }
+    else
+        gen_expr(root);
 }
 
 void interm_generator::gen_func(astree* root) {
@@ -410,6 +480,12 @@ void interm_generator::gen_func(astree* root) {
         if(strcmp(name, "VARDECL")) break;
         gen_local_var(child);
     }
+    // dump exprs
+    for(; i < block->children.size(); ++i) {
+        astree* child = block->children[i];
+        gen_func_expr(child);
+    }
+
     fprintf(outfile, "}\n");
 }
 

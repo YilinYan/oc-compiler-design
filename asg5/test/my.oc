@@ -25,6 +25,22 @@ int this_is_a_func(int a, int b, foo c) {
     foo[] sth = new foo[a+b];
     foo test = new foo;
     foo aaa = sth[100];
+    
+    while(a < b) {
+        test->a = 10;
+        a = b;
+    }
+    
+    if(a!=b) {
+        a = b;
+        a = a+b;
+    } else if(a == b){
+        a = a%b;
+    }
+    else {
+        a = a/b;
+    }
+
     return a;
 }
 
