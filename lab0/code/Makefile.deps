@@ -1,3 +1,0 @@
-yyparse.o: yyparse.cpp extern.h yyparse.h
-yylex.o: yylex.cpp extern.h yyparse.h
-main.o: main.cpp extern.h yyparse.h
